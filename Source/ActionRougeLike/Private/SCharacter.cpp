@@ -45,8 +45,12 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	const FName forward = "MoveForward";
+	PlayerInputComponent->BindAxis(forward, this, &ASCharacter::MoveForward);
+	//const FName side = "MoveSide";
+	//PlayerInputComponent->BindAxis(side, this, &ASCharacter::MoveForward);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &ASCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveSide", this, &ASCharacter::MoveForward);
+	const FName turn = "Turn";
+	PlayerInputComponent->BindAxis(turn, this, &APawn::AddControllerYawInput);
 }
 
