@@ -13,16 +13,16 @@ ASCharacter::ASCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SpringArmComp->bUsePawnControlRotation = 1; //or true (just testing it)
-
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
 	SpringArmComp->SetupAttachment(RootComponent);
+	SpringArmComp->bUsePawnControlRotation = true; //or true (just testing it)
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	//rotate to whatever we are moving towards
-	//GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	
 
 	bUseControllerRotationYaw = false;
 }
@@ -36,14 +36,25 @@ void ASCharacter::BeginPlay()
 
 void ASCharacter::MoveForward(float value)
 {
-	AddMovementInput(GetActorForwardVector(), value);
+	FRotator ControlBot = GetControlRotation();
+	ControlBot.Pitch = 0.0f;
+	ControlBot.Roll = 0.0f;
+	AddMovementInput(ControlBot.Vector(), value);
 
 
 }
 
 void ASCharacter::MoveRight(float value)
 {
-	AddMovementInput(GetActorRightVector(), value);
+	FRotator ControlBot = GetControlRotation();
+	ControlBot.Pitch = 0.0f;
+	ControlBot.Roll = 0.0f;
+
+	// X forward (red), Y is right (Green), z is up (blue) (unlike unity)
+
+	FVector RightVector = FRotationMatrix(ControlBot).GetScaledAxis(EAxis::Y);
+
+	AddMovementInput(RightVector, value);
 }
 
 // Called every frame
