@@ -34,29 +34,6 @@ void ASCharacter::BeginPlay()
 	
 }
 
-void ASCharacter::MoveForward(float value)
-{
-	FRotator ControlBot = GetControlRotation();
-	ControlBot.Pitch = 0.0f;
-	ControlBot.Roll = 0.0f;
-	AddMovementInput(ControlBot.Vector(), value);
-
-
-}
-
-void ASCharacter::MoveRight(float value)
-{
-	FRotator ControlBot = GetControlRotation();
-	ControlBot.Pitch = 0.0f;
-	ControlBot.Roll = 0.0f;
-
-	// X forward (red), Y is right (Green), z is up (blue) (unlike unity)
-
-	FVector RightVector = FRotationMatrix(ControlBot).GetScaledAxis(EAxis::Y);
-
-	AddMovementInput(RightVector, value);
-}
-
 // Called every frame
 void ASCharacter::Tick(float DeltaTime)
 {
@@ -78,5 +55,47 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis(turn, this, &APawn::AddControllerYawInput);
 	const FName lookup = "Lookup";
 	PlayerInputComponent->BindAxis(lookup, this, &APawn::AddControllerPitchInput);
+
+	//spawn projectile
+	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
+
 }
+
+
+void ASCharacter::PrimaryAttack()
+{
+	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
+
+	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+}
+
+//movement
+void ASCharacter::MoveForward(float value)
+{
+	FRotator ControlBot = GetControlRotation();
+	ControlBot.Pitch = 0.0f;
+	ControlBot.Roll = 0.0f;
+	AddMovementInput(ControlBot.Vector(), value);
+
+
+}
+void ASCharacter::MoveRight(float value)
+{
+	FRotator ControlBot = GetControlRotation();
+	ControlBot.Pitch = 0.0f;
+	ControlBot.Roll = 0.0f;
+
+	// X forward (red), Y is right (Green), z is up (blue) (unlike unity)
+
+	FVector RightVector = FRotationMatrix(ControlBot).GetScaledAxis(EAxis::Y);
+
+	AddMovementInput(RightVector, value);
+}
+
 
