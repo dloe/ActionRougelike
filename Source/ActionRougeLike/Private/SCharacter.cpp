@@ -2,10 +2,12 @@
 
 
 #include "SCharacter.h"
+#include "SCharacter.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "SInteractionActorComponent.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -19,6 +21,8 @@ ASCharacter::ASCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	InteractiveComp = CreateDefaultSubobject<USInteractionActorComponent>("InteractionComp");
 
 	//rotate to whatever we are moving towards
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -56,23 +60,40 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	const FName lookup = "Lookup";
 	PlayerInputComponent->BindAxis(lookup, this, &APawn::AddControllerPitchInput);
 
+	const FName jump = "Jump";
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASCharacter::Jump);
+
+
+
 	//spawn projectile
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 
+	//interactjion
+	const FName interact = "PrimaryInteract";
+	PlayerInputComponent->BindAction(interact, IE_Pressed, this, &ASCharacter::PrimaryInteract);
 }
 
 
 void ASCharacter::PrimaryAttack()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
 
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+	const FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+}
+
+void ASCharacter::PrimaryInteract()
+{
+	if(InteractiveComp)
+	{
+		InteractiveComp->PrimaryInteract();
+	}
+	
 }
 
 //movement
@@ -93,9 +114,10 @@ void ASCharacter::MoveRight(float value)
 
 	// X forward (red), Y is right (Green), z is up (blue) (unlike unity)
 
-	FVector RightVector = FRotationMatrix(ControlBot).GetScaledAxis(EAxis::Y);
+	const FVector RightVector = FRotationMatrix(ControlBot).GetScaledAxis(EAxis::Y);
 
 	AddMovementInput(RightVector, value);
 }
+
 
 
