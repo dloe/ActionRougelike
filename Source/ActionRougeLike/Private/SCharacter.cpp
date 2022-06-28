@@ -17,7 +17,7 @@ ASCharacter::ASCharacter()
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->bUsePawnControlRotation = true; //or true (just testing it)
+	SpringArmComp->bUsePawnControlRotation = true;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
