@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SInteractionActorComponent.h"
+#include <ActionRougeLike/Public/SAttributeComponent.h>
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -23,6 +24,8 @@ ASCharacter::ASCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	InteractiveComp = CreateDefaultSubobject<USInteractionActorComponent>("InteractionComp");
+
+	AttributeComponent = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
 	//rotate to whatever we are moving towards
 	GetCharacterMovement()->bOrientRotationToMovement = true;

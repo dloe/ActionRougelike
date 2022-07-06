@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SAttributeComponent.h"
 #include "SInteractionActorComponent.h"
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
@@ -39,7 +40,11 @@ protected:
 	UCameraComponent* CameraComp;
 
 	//interaction
+	UPROPERTY(VisibleAnywhere)
 	USInteractionActorComponent* InteractiveComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USAttributeComponent* AttributeComponent;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
