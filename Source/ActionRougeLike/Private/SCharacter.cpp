@@ -2,13 +2,14 @@
 
 
 #include "SCharacter.h"
-#include "SCharacter.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SInteractionActorComponent.h"
 #include <ActionRougeLike/Public/SAttributeComponent.h>
+
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -30,6 +31,7 @@ ASCharacter::ASCharacter()
 	//rotate to whatever we are moving towards
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
+	//PlayerController = GetWorld()->GetFirstPlayerController();
 
 	bUseControllerRotationYaw = false;
 }
@@ -101,10 +103,41 @@ void ASCharacter::PrimaryInteract()
 //function that is called once time is done (for timer)
 void ASCharacter::PrimaryAttack_TimeElasped()
 {
+	float basicTraceRange = 5000; 
 	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
+	//the crosshair is at the forward vector of camera so might as well just use that
+	FVector TraceStart = CameraComp->GetComponentLocation();
+	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * basicTraceRange);
 
-	const FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+	//for trace
+
+	FCollisionShape Shape;
+	Shape.SetSphere(20.0f);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+	FHitResult hitCam;
+
+	//if we dont hit anything just use the end of the trace line
+	FVector projectileEndLocale = TraceEnd;
+	//if(GetWorld()->LineTraceSingleByObjectType(hitCam, TraceStart, TraceEnd, ObjectQueryParams))
+	if(GetWorld()->SweepSingleByObjectType(hitCam, TraceStart, TraceEnd, FQuat::Identity, ObjectQueryParams, Shape, Params))
+	{
+		//if we got a hit, then we now have a start (handlocation), and end point (hitCam.ImpactPoint)
+		projectileEndLocale = hitCam.ImpactPoint;
+	}
+
+	//rotation is looking at that point we now have
+	FRotator ProjectileSpawnRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, projectileEndLocale);
+
+	//replaced GetControlRotation with our new target rotation
+	const FTransform SpawnTM = FTransform(ProjectileSpawnRotation, HandLocation);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

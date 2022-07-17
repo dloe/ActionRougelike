@@ -46,6 +46,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComponent;
 
+	
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
