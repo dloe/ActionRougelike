@@ -31,11 +31,11 @@ void ATeleportProjectile::BeginPlay()
 
 void ATeleportProjectile::OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Log, TEXT("Hit2!"));
+	//UE_LOG(LogTemp, Log, TEXT("Hit2!"));
 	//if(OtherActor && OtherActor != GetInstigator())
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
 	{
-		UE_LOG(LogTemp, Log, TEXT("Hit!"));
+		//UE_LOG(LogTemp, Log, TEXT("Hit!"));
 		DrawDebugSphere(GetWorld(), GetActorLocation(), 100, 12, FColor::Red, 1.0f, 0.0f);
 		//run detonation sequence
 		Explode_Implementation();
@@ -45,7 +45,7 @@ void ATeleportProjectile::OnActorHit(UPrimitiveComponent* HitComp, AActor* Other
 void ATeleportProjectile::Explode_Implementation()
 {
 	GetWorldTimerManager().ClearTimer(TeleportTimerHandle);
-	UE_LOG(LogTemp, Log, TEXT("Start Detonation!"));
+	//UE_LOG(LogTemp, Log, TEXT("Start Detonation!"));
 	//stop movement
 	MoveComp->StopMovementImmediately();
 	//nothing can collide while we explode
