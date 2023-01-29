@@ -27,10 +27,14 @@ protected:
 	TSubclassOf<AActor>BlackholeProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor>TeleportProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
 	FTimerHandle TimerHandle_BlackholeAttack;
+	FTimerHandle TimerHandle_TeleportAttack;
 
 public:
 	// Sets default values for this character's properties
@@ -57,6 +61,8 @@ protected:
 
 	void MoveForward(float value);
 	void MoveRight(float value);
+
+	void SpawnProjectile(TSubclassOf<AActor> classToSpawn);
 
 	void BlackholeAttack();
 

@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "SMagicProjectile.h"
+#include "SProjectileBase.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TeleportProjectile.generated.h"
 
 
 UCLASS()
-class ACTIONROUGELIKE_API ATeleportProjectile : public ASMagicProjectile
+class ACTIONROUGELIKE_API ATeleportProjectile : public ASProjectileBase
 {
 	GENERATED_BODY()
 	
@@ -18,13 +18,23 @@ public:
 	ATeleportProjectile();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Teleport")
+	float TeleportDelay;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Teleport")
+	float DetonateDelay;
+
+	UPROPERTY()
+	FTimerHandle TeleportTimerHandle;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	void OnActorOverlapTeleport(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void Explode_Implementation() override;
+
+	void TeleportSequence();
+
+	virtual void BeginPlay() override;
 
 };

@@ -107,47 +107,8 @@ void ASCharacter::PrimaryInteract()
 //function that is called once time is done (for timer)
 void ASCharacter::PrimaryAttack_TimeElasped()
 {
-	float basicTraceRange = 5000; 
-	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	SpawnProjectile(ProjectileClass);
 
-	//the crosshair is at the forward vector of camera so might as well just use that
-	FVector TraceStart = CameraComp->GetComponentLocation();
-	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * basicTraceRange);
-
-	//for trace
-
-	FCollisionShape Shape;
-	Shape.SetSphere(20.0f);
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
-	FHitResult hitCam;
-
-	//if we dont hit anything just use the end of the trace line
-	FVector projectileEndLocale = TraceEnd;
-	//if(GetWorld()->LineTraceSingleByObjectType(hitCam, TraceStart, TraceEnd, ObjectQueryParams))
-	if(GetWorld()->SweepSingleByObjectType(hitCam, TraceStart, TraceEnd, FQuat::Identity, ObjectQueryParams, Shape, Params))
-	{
-		//if we got a hit, then we now have a start (handlocation), and end point (hitCam.ImpactPoint)
-		projectileEndLocale = hitCam.ImpactPoint;
-	}
-
-	//rotation is looking at that point we now have
-	FRotator ProjectileSpawnRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, projectileEndLocale);
-
-	//replaced GetControlRotation with our new target rotation
-	const FTransform SpawnTM = FTransform(ProjectileSpawnRotation, HandLocation);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 
 
 }
@@ -175,6 +136,62 @@ void ASCharacter::MoveRight(float value)
 	AddMovementInput(RightVector, value);
 }
 
+void ASCharacter::SpawnProjectile(TSubclassOf <AActor> classToSpawn)
+{
+	if (ensureAlways(classToSpawn))
+	{
+
+		const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+
+
+		FCollisionShape Shape;
+		Shape.SetSphere(20.0f);
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+		ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+
+
+		//for trace
+		float basicTraceRange = 5000;
+
+		//the crosshair is at the forward vector of camera so might as well just use that
+		FVector TraceStart = CameraComp->GetComponentLocation();
+
+		//endpoint far into the look at distance (not to far, still somewhat towards crosshair on a miss)
+		FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * basicTraceRange);
+		
+		FHitResult hitCam;
+		//if we dont hit anything just use the end of the trace line
+		FVector projectileEndLocale = TraceEnd;
+		//if(GetWorld()->LineTraceSingleByObjectType(hitCam, TraceStart, TraceEnd, ObjectQueryParams))
+		if (GetWorld()->SweepSingleByObjectType(hitCam, TraceStart, TraceEnd, FQuat::Identity, ObjectQueryParams, Shape, Params))
+		{
+			//if we got a hit, then we now have a start (handlocation), and end point (hitCam.ImpactPoint)
+			projectileEndLocale = hitCam.ImpactPoint;
+		}
+
+		//OLD - rotation is looking at that point we now have
+		//FRotator ProjectileSpawnRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, projectileEndLocale);
+
+		//more accurate version
+		FRotator ProjRotation = FRotationMatrix::MakeFromX(projectileEndLocale - HandLocation).Rotator();
+
+
+		//replaced GetControlRotation with our new target rotation
+		const FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
+		GetWorld()->SpawnActor<AActor>(classToSpawn, SpawnTM, SpawnParams);
+	}
+}
+
 //blackhole assignment 2
 void ASCharacter::BlackholeAttack()
 {
@@ -193,48 +210,7 @@ void ASCharacter::BlackholeAttack()
 //function that is called once time is done (for timer)
 void ASCharacter::BlackholeAttack_TimeElasped()
 {
-	float basicTraceRange = 5000;
-	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-
-	//the crosshair is at the forward vector of camera so might as well just use that
-	FVector TraceStart = CameraComp->GetComponentLocation();
-	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * basicTraceRange);
-
-	//for trace
-
-	FCollisionShape Shape;
-	Shape.SetSphere(20.0f);
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
-	FHitResult hitCam;
-
-	//if we dont hit anything just use the end of the trace line
-	FVector projectileEndLocale = TraceEnd;
-	//if(GetWorld()->LineTraceSingleByObjectType(hitCam, TraceStart, TraceEnd, ObjectQueryParams))
-	if (GetWorld()->SweepSingleByObjectType(hitCam, TraceStart, TraceEnd, FQuat::Identity, ObjectQueryParams, Shape, Params))
-	{
-		//if we got a hit, then we now have a start (handlocation), and end point (hitCam.ImpactPoint)
-		projectileEndLocale = hitCam.ImpactPoint;
-	}
-
-	//rotation is looking at that point we now have
-	FRotator ProjectileSpawnRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, projectileEndLocale);
-
-	//replaced GetControlRotation with our new target rotation
-	const FTransform SpawnTM = FTransform(ProjectileSpawnRotation, HandLocation);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	GetWorld()->SpawnActor<AActor>(BlackholeProjectileClass, SpawnTM, SpawnParams);
-
+	SpawnProjectile(BlackholeProjectileClass);
 
 }
 
@@ -247,52 +223,12 @@ void ASCharacter::TeleportAbility()
 	PlayAnimMontage(AttackAnim);
 
 
-	GetWorldTimerManager().SetTimer(TimerHandle_BlackholeAttack, this, &ASCharacter::BlackholeAttack_TimeElasped, 0.2f);
+	GetWorldTimerManager().SetTimer(TimerHandle_TeleportAttack, this, &ASCharacter::TeleportAbility_TimeElasped, 0.2f);
 
 }
 
 void ASCharacter::TeleportAbility_TimeElasped()
 {
-	float basicTraceRange = 5000;
-	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	SpawnProjectile(TeleportProjectileClass);
 
-	//the crosshair is at the forward vector of camera so might as well just use that
-	FVector TraceStart = CameraComp->GetComponentLocation();
-	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * basicTraceRange);
-
-	//for trace
-
-	FCollisionShape Shape;
-	Shape.SetSphere(20.0f);
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
-	FHitResult hitCam;
-
-	//if we dont hit anything just use the end of the trace line
-	FVector projectileEndLocale = TraceEnd;
-	//if(GetWorld()->LineTraceSingleByObjectType(hitCam, TraceStart, TraceEnd, ObjectQueryParams))
-	if (GetWorld()->SweepSingleByObjectType(hitCam, TraceStart, TraceEnd, FQuat::Identity, ObjectQueryParams, Shape, Params))
-	{
-		//if we got a hit, then we now have a start (handlocation), and end point (hitCam.ImpactPoint)
-		projectileEndLocale = hitCam.ImpactPoint;
-	}
-
-	//rotation is looking at that point we now have
-	FRotator ProjectileSpawnRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, projectileEndLocale);
-
-	//replaced GetControlRotation with our new target rotation
-	const FTransform SpawnTM = FTransform(ProjectileSpawnRotation, HandLocation);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	//sub in our teleport projectile
-	GetWorld()->SpawnActor<AActor>(BlackholeProjectileClass, SpawnTM, SpawnParams);
 }
