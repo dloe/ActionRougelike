@@ -78,7 +78,7 @@ void ATeleportProjectile::TeleportSequence()
 		ActorToTeleport->TeleportTo(GetActorLocation(), ActorToTeleport->GetActorRotation(), false, false);
 
 		//destroy this obj
-		Destroy();
+		//Destroy();
 	}
 }
 
