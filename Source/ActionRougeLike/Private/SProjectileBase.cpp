@@ -7,7 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
-#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 // Sets default values
 ASProjectileBase::ASProjectileBase()
@@ -28,10 +28,19 @@ ASProjectileBase::ASProjectileBase()
 
 }
 
+void ASProjectileBase::BeginPlay()
+{
+	//ignore actor when moving
+	
+
+
+}
 
 void ASProjectileBase::OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	Explode();
+	//if (OtherActor != GetInstigator()) {
+		Explode();
+	//}
 }
 
 //implementation from it being marked as BlueprintNativeEvent
@@ -53,5 +62,7 @@ void ASProjectileBase::PostInitializeComponents()
 	//SphereComp->IgnoreActorWhenMoving(GetInstigator(), true);
 	SphereComp->OnComponentHit.AddDynamic(this, &ASProjectileBase::OnActorHit);
 }
+
+
 
 

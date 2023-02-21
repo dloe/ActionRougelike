@@ -7,7 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
-
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 // Sets default values
 ASMagicProjectile::ASMagicProjectile()
@@ -18,7 +18,9 @@ ASMagicProjectile::ASMagicProjectile()
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
 	SphereComp->SetCollisionProfileName("Projectile");
+	//SphereComp->Simulat
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ASMagicProjectile::OnActorOverlap);
+	SphereComp->OnComponentHit.AddDynamic(this, &ASMagicProjectile::OnCompHit);
 	RootComponent = SphereComp;
 
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
@@ -28,6 +30,14 @@ ASMagicProjectile::ASMagicProjectile()
 	MovementComp->InitialSpeed = 1000.0f;
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
+
+
+	myRadialForce = CreateDefaultSubobject<URadialForceComponent>("myRadialForce");
+	myRadialForce->Radius = 700;
+	myRadialForce->ImpulseStrength = 1000;
+	//optional, ignore 'Mass' of other objects (if false, the impulse strength will be much higher to push most objects depending on mass)
+	myRadialForce->bImpulseVelChange = false;
+	myRadialForce->SetupAttachment(RootComponent);
 }
 //UPrimitiveComponent* OnComponentBeginOverlap, 
 void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -39,9 +49,33 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		{
 			AttributeComp->ApplyHealthChange(Damage);
 
+			//spawn emmiter at location
+			UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+
 			Destroy();
 		}
+
+		//UE_LOG(LogTemp, Log, TEXT("OnActorOverlap in projectile"));
+
 	}
+}
+
+void ASMagicProjectile::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	
+	//FString temp = OtherActor->GetFName().ToString();
+	//UE_LOG(LogTemp, Log, TEXT("Other actor: s%"), temp);
+	//if (OtherActor && OtherActor != GetInstigator())
+	//{
+		//UE_LOG(LogTemp, Log, TEXT("OnCompHit in projectile"));
+		//if we hit anything else (logic ported from blueprint)
+
+		DrawDebugSphere(GetWorld(), GetActorLocation(), 100, 12, FColor::White, 1.0f, 0.0f);
+
+		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+
+		Destroy();
+	//}
 }
 
 // Called when the game starts or when spawned
