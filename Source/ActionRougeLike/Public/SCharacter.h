@@ -57,6 +57,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	int HitFlashSpeed;
 
+	//UPROPERTY(EditDefaultsOnly)
+	//FVector4 HitFlashColor;
+
 	UPROPERTY(EditDefaultsOnly)
 	FColor HitFlashColor;
 

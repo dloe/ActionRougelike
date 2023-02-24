@@ -113,21 +113,14 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 		UE_LOG(LogTemp, Log, TEXT("On Health changed!"));
 		//change material
 		
-		//if (MatInstance) {
-			//MeshComp->GetScalar
-			//MatInstance->SetScalarParameterValueOnMaterials("TimeToFlash", GetWorld()->TimeSeconds);
-			
 			USkeletalMeshComponent* SkeletalMesh = GetMesh();
 			SkeletalMesh->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+			//SkeletalMesh->SetParameterValueOnMaterials("HitFlashColor", HitFlashColor);
+			FVector4 ColortoVector = HitFlashColor;
+			SkeletalMesh->SetVectorParameterValueOnMaterials("HitFlashColor", ColortoVector);
+			
 			SkeletalMesh->SetScalarParameterValueOnMaterials("HitFlashSpeed", HitFlashSpeed);
-			//TArray<FSkeletalMaterial> mats = SkeletalMesh->GetMaterials();
-			//for each (FSkeletalMaterial m in mats)
-			//{
-				//m.SetScalarParameterValueOnMaterials("TimeToFlash", GetWorld()->TimeSeconds);
-			//}
-		//}
-		//else
-			//UE_LOG(LogTemp, Log, TEXT("No Mat Instance!"));
+
 	}
 	
 
