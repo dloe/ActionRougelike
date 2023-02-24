@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PhysicsEngine/RadialForceComponent.h"
+#include "Runtime/Engine/Classes/Sound/SoundCue.h"
+#include "Components/AudioComponent.h"
 #include "SMagicProjectile.generated.h"
 
 
@@ -12,7 +14,7 @@ class USphereComponent;
 class UProjectileMovementComponent;
 class UParticleSystemComponent;
 
-//class URadialForceComponent;
+class AudioComponent;
 
 UCLASS()
 class ACTIONROUGELIKE_API ASMagicProjectile : public AActor
@@ -46,8 +48,24 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	URadialForceComponent* myRadialForce;
 
+	//sound cue
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* ImpactSound;
+
+	//UPROPERTY(VisibleAnywhere, Category = "Sounds")
+	//USoundCue* FlightSound;
+
+	//need one for flight and for impact
+	//dont need impact
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//UAudioComponent* AudioCompImpact;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UAudioComponent* AudioCompFlight;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void PostInitializeComponents() override;
 
 public:	
 	// Called every frame

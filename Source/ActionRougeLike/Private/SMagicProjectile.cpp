@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+//#include "Components/AudioComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -38,6 +39,11 @@ ASMagicProjectile::ASMagicProjectile()
 	//optional, ignore 'Mass' of other objects (if false, the impulse strength will be much higher to push most objects depending on mass)
 	myRadialForce->bImpulseVelChange = false;
 	myRadialForce->SetupAttachment(RootComponent);
+
+	AudioCompFlight = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+	AudioCompFlight->SetupAttachment(RootComponent);
+	AudioCompFlight->Play(0.0f);
+	
 }
 //UPrimitiveComponent* OnComponentBeginOverlap, 
 void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -62,7 +68,7 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 
 void ASMagicProjectile::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	
+	//double check this with answer
 	//FString temp = OtherActor->GetFName().ToString();
 	//UE_LOG(LogTemp, Log, TEXT("Other actor: s%"), temp);
 	//if (OtherActor && OtherActor != GetInstigator())
@@ -74,6 +80,8 @@ void ASMagicProjectile::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherAct
 
 		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
 
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(),ImpactSound, GetActorLocation(),GetActorRotation());
+
 		Destroy();
 	//}
 }
@@ -83,6 +91,11 @@ void ASMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ASMagicProjectile::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 }
 
 // Called every frame
