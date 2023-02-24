@@ -34,6 +34,10 @@ ASCharacter::ASCharacter()
 	//PlayerController = GetWorld()->GetFirstPlayerController();
 
 	bUseControllerRotationYaw = false;
+
+	//get our material instance for flash mat
+	
+		//GetMaterial(0);
 }
 
 
@@ -94,13 +98,40 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
-	UE_LOG(LogTemp, Log, TEXT("Player Dead!"));
+	
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{
+		UE_LOG(LogTemp, Log, TEXT("Player Death!"));
 		APlayerController* PC = Cast<APlayerController>(GetController());
 		DisableInput(PC);
 		
+
+		
 	}
+	else if (Delta < 0.0f)                                                //Player took damange but not dead
+	{
+		UE_LOG(LogTemp, Log, TEXT("On Health changed!"));
+		//change material
+		
+		//if (MatInstance) {
+			//MeshComp->GetScalar
+			//MatInstance->SetScalarParameterValueOnMaterials("TimeToFlash", GetWorld()->TimeSeconds);
+			
+			USkeletalMeshComponent* SkeletalMesh = GetMesh();
+			SkeletalMesh->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+			SkeletalMesh->SetScalarParameterValueOnMaterials("HitFlashSpeed", HitFlashSpeed);
+			//TArray<FSkeletalMaterial> mats = SkeletalMesh->GetMaterials();
+			//for each (FSkeletalMaterial m in mats)
+			//{
+				//m.SetScalarParameterValueOnMaterials("TimeToFlash", GetWorld()->TimeSeconds);
+			//}
+		//}
+		//else
+			//UE_LOG(LogTemp, Log, TEXT("No Mat Instance!"));
+	}
+	
+
+
 }
 
 void ASCharacter::PrimaryAttack()

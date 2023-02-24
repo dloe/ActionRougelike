@@ -54,7 +54,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComponent;
 
-	
+	UPROPERTY(EditDefaultsOnly)
+	int HitFlashSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	FColor HitFlashColor;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
