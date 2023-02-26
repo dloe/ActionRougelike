@@ -73,7 +73,7 @@ void ASMagicProjectile::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherAct
 	//UE_LOG(LogTemp, Log, TEXT("Other actor: s%"), temp);
 	//if (OtherActor && OtherActor != GetInstigator())
 	//{
-		//UE_LOG(LogTemp, Log, TEXT("OnCompHit in projectile"));
+		UE_LOG(LogTemp, Log, TEXT("OnCompHit in projectile"));
 		//if we hit anything else (logic ported from blueprint)
 
 		DrawDebugSphere(GetWorld(), GetActorLocation(), 100, 12, FColor::White, 1.0f, 0.0f);

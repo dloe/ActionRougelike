@@ -25,8 +25,12 @@ protected:
 
 	//other examples
 	//HealthMax, stamina, strength
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attributes")
+	float HealthMax = 100;
 
 public:
+
+	
 
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;
