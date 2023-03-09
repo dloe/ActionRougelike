@@ -50,7 +50,7 @@ void USInteractionActorComponent::PrimaryInteract()
 	FRotator EyeRotation;
 	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
-	End = EyeLocation + (EyeRotation.Vector() * 1000);
+	End = EyeLocation + (EyeRotation.Vector() * 1000); //CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 1000);//EyeLocation + (EyeRotation.Vector() * 1000);
 
 	//v1
 	//FHitResult hit;
