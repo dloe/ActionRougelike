@@ -7,7 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
-//#include "Components/AudioComponent.h"
+//#include "Camera/CameraShakeBase.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -81,6 +81,15 @@ void ASMagicProjectile::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherAct
 		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
 
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(),ImpactSound, GetActorLocation(),GetActorRotation());
+
+		//camera shake on projectile impact
+		//add camera shake at a certain location in the world then look for players within their affected radius and apply 
+		//the scale based on how close they are
+		//const UObject* WorldContextObject, TSubclassOf<class UCameraShakeBase> Shake, FVector Epicenter, float InnerRadius, float OuterRadius, float Falloff, bool bOrientShakeTowardsEpicenter
+		
+		//establish radius for myshake
+		//make outer and inner radius float vars editable via inspector
+		UGameplayStatics::PlayWorldCameraShake(this, MyShake, Hit.ImpactPoint, InnerRadius, OuterRadius, Falloff);
 
 		Destroy();
 	//}

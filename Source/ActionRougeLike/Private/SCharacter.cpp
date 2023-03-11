@@ -7,6 +7,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SInteractionActorComponent.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include <ActionRougeLike/Public/SAttributeComponent.h>
 
 #include "Kismet/KismetMathLibrary.h"
@@ -23,6 +25,9 @@ ASCharacter::ASCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	EffectSpellCastComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
+	EffectSpellCastComp->SetupAttachment(RootComponent);
 
 	InteractiveComp = CreateDefaultSubobject<USInteractionActorComponent>("InteractionComp");
 
@@ -186,6 +191,16 @@ void ASCharacter::SpawnProjectile(TSubclassOf <AActor> classToSpawn)
 	{
 
 		const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
+		//EPSCPoolMethod PoolingMethod; //defaults to none
+		//attach location can be KeepWorldPosition or KeepRelativeOffset
+		// scale shouldnt be needed if we use keepworldposition
+		
+		//have particle effect in players hand when shooting projectile
+		//should be where our hand socket is, where the projectile spawns in
+		// cast root component as a scene component?
+		//UParticleSystem* EmitterTemplate, USceneComponent* AttachToComponent, FName AttachPointName, FVector Location, FRotator Rotation, FVector Scale, EAttachLocation::Type LocationType, bool bAutoDestroy, EPSCPoolMethod PoolingMethod, bool bAutoActivateSystem
+		UGameplayStatics::SpawnEmitterAttached(CastSpellVFX, GetMesh(), "Muzzle_01", HandLocation, GetControlRotation(), EAttachLocation::KeepWorldPosition, true, EPSCPoolMethod::None, true);
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

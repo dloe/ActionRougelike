@@ -9,7 +9,6 @@
 #include "Components/AudioComponent.h"
 #include "SMagicProjectile.generated.h"
 
-
 class USphereComponent;
 class UProjectileMovementComponent;
 class UParticleSystemComponent;
@@ -52,15 +51,20 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* ImpactSound;
 
-	//UPROPERTY(VisibleAnywhere, Category = "Sounds")
-	//USoundCue* FlightSound;
-
-	//need one for flight and for impact
-	//dont need impact
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//UAudioComponent* AudioCompImpact;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UAudioComponent* AudioCompFlight;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TSubclassOf<UCameraShakeBase> MyShake;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	float InnerRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	float OuterRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	float Falloff;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
