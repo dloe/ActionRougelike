@@ -23,13 +23,22 @@ bool USAttributeComponent::IsAlive() const
 
 bool USAttributeComponent::ApplyHealthChange(float Delta)
 {
+	float OldHealth = Health;
+
+
 	//Health += Delta;
-	UE_LOG(LogTemp, Log, TEXT("Health: %f"), Health);
+	//UE_LOG(LogTemp, Log, TEXT("Health: %f"), Health);
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
-	UE_LOG(LogTemp, Log, TEXT("New Health: %f"), Health);
+
+	float HealthDelta = Health - OldHealth;
+	OnHealthChanged.Broadcast(nullptr, this, Health, HealthDelta); //still nullptr for Instigator Param
+
+	//UE_LOG(LogTemp, Log, TEXT("New Health: %f"), Health);
 	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
 	//for now it will return true, we can add to this later
-	return true;
+
+	//make sure we know if this even applied a health change
+	return HealthDelta != 0;
 }
 
 bool USAttributeComponent::IsUnderMaxHealth() const

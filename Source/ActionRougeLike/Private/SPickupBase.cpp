@@ -4,6 +4,7 @@
 #include "SPickupBase.h"
 #include "SAttributeComponent.h"
 #include "GameFramework/Actor.h"
+#include "Components/SphereComponent.h"
 #include "SGameplayInterface.h"
 
 
@@ -13,8 +14,11 @@ ASPickupBase::ASPickupBase()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
-	RootComponent = BaseMesh;
+	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	SphereComp->SetCollisionProfileName("Powerup");
+	RootComponent = SphereComp;
+
+	
 
 	//HealthIncrease
 	Triggered = false;
@@ -59,10 +63,21 @@ void ASPickupBase::OnTriggerTimer()
 
 	//set mesh invisible and turn off interaction!
 	//BaseMesh->SetStaticMesh(NormalPotionMesh);
-	BaseMesh->SetVisibility(true);
+	BaseMesh->SetVisibility(true, true);
 
 	//turn on overlap events
 	SetActorEnableCollision(true);
 
 	GetWorldTimerManager().ClearTimer(TimerHandle);
+}
+
+void ASPickupBase::ShowPowerup(bool state)
+{
+	//set mesh invisible and turn off interaction!
+	//BaseMesh->SetStaticMesh(NormalPotionMesh);
+	BaseMesh->SetVisibility(state, state);
+
+	//turn on overlap events
+	SetActorEnableCollision(state);
+
 }

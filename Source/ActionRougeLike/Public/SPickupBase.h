@@ -48,4 +48,6 @@ public:
 	virtual void Interact_Implementation(APawn* InstigatorPawn);
 
 	virtual void OnTriggerTimer();
+
+	virtual void ShowPowerup(bool state);
 };

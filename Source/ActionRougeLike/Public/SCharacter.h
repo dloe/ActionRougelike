@@ -70,6 +70,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	FColor HitFlashColor;
 
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName HandSocketName;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

@@ -42,7 +42,7 @@ ASCharacter::ASCharacter()
 
 	//get our material instance for flash mat
 	
-		//GetMaterial(0);
+	HandSocketName = "Muzzle_01";
 }
 
 
@@ -189,8 +189,8 @@ void ASCharacter::SpawnProjectile(TSubclassOf <AActor> classToSpawn)
 {
 	if (ensureAlways(classToSpawn))
 	{
-
-		const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		//use handsocketname instead of muzzle_01
+		const FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
 
 		//EPSCPoolMethod PoolingMethod; //defaults to none
 		//attach location can be KeepWorldPosition or KeepRelativeOffset
@@ -200,7 +200,10 @@ void ASCharacter::SpawnProjectile(TSubclassOf <AActor> classToSpawn)
 		//should be where our hand socket is, where the projectile spawns in
 		// cast root component as a scene component?
 		//UParticleSystem* EmitterTemplate, USceneComponent* AttachToComponent, FName AttachPointName, FVector Location, FRotator Rotation, FVector Scale, EAttachLocation::Type LocationType, bool bAutoDestroy, EPSCPoolMethod PoolingMethod, bool bAutoActivateSystem
-		UGameplayStatics::SpawnEmitterAttached(CastSpellVFX, GetMesh(), "Muzzle_01", HandLocation, GetControlRotation(), EAttachLocation::KeepWorldPosition, true, EPSCPoolMethod::None, true);
+		// instructor used CastSpellVFX, GetMesh,HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget
+		//UGameplayStatics::SpawnEmitterAttached(CastSpellVFX, GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
+		//UGameplayStatics::SpawnEmitterAttached(CastSpellVFX, GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true, EPSCPoolMethod::None, true);
+		UGameplayStatics::SpawnEmitterAttached(CastSpellVFX, GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
