@@ -49,7 +49,7 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ASHealthPotion::OnTriggerTimer, TriggerDelay);
 			
-				AttributeComp->ApplyHealthChange(HealthIncrease);
+				AttributeComp->ApplyHealthChange(this, HealthIncrease);
 		}
 	}
 

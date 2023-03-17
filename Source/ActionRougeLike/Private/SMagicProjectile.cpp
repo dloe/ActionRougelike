@@ -52,7 +52,8 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 		if(AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(-Damage);
+			//instead of passing this object, lets pass instigator since it should be more useful because it should be the player or the minion
+			AttributeComp->ApplyHealthChange(GetInstigator(), - Damage);
 
 			//spawn emmiter at location
 			UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());

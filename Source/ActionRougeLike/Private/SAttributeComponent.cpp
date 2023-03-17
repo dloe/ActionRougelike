@@ -21,7 +21,7 @@ bool USAttributeComponent::IsAlive() const
 	return Health > 0.0f;
 }
 
-bool USAttributeComponent::ApplyHealthChange(float Delta)
+bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 {
 	float OldHealth = Health;
 
@@ -31,10 +31,10 @@ bool USAttributeComponent::ApplyHealthChange(float Delta)
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
 	float HealthDelta = Health - OldHealth;
-	OnHealthChanged.Broadcast(nullptr, this, Health, HealthDelta); //still nullptr for Instigator Param
+	OnHealthChanged.Broadcast(Instigator, this, Health, HealthDelta);
 
 	//UE_LOG(LogTemp, Log, TEXT("New Health: %f"), Health);
-	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
+	//OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
 	//for now it will return true, we can add to this later
 
 	//make sure we know if this even applied a health change

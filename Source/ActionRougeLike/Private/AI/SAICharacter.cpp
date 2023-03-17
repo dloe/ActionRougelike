@@ -32,19 +32,10 @@ void ASAICharacter::PostInitializeComponents()
 
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
-    AAIController* AIC = Cast<AAIController>(GetController());
-
-    if (AIC)
-    {
-        //dont even need to null check this since we know for a fact this is valid. Cannot be null
-        UBlackboardComponent* BBComp = AIC->GetBlackboardComponent();
-
-        //for now we will keep them hard coded values
-        BBComp->SetValueAsObject("TargetActor", Pawn);
-
-        //add a draw debug string at the location of the actor so that we have something that shows where the player was spotted
-        DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted", nullptr, FColor::White, 4.0f, true);
-    }
+    SetTargetActor(Pawn);
+    //add a draw debug string at the location of the actor so that we have something that shows where the player was spotted
+    DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted", nullptr, FColor::White, 4.0f, true);
+    
 
 }
 
@@ -52,7 +43,12 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 {
     if (Delta < 0.0f)
     {
-
+        //if we shoot at the AI the AI needs to know that someone shot at them and whoever shot our AI needs to become the designated target
+        //theres a chance that an AI might shoot a friendly AI and they might agro on each other, will keep for now but might remove later
+        if (InstigatorActor)
+        {
+            SetTargetActor(InstigatorActor);
+        }
 
         if (NewHealth <= 0.0f)
         {
@@ -71,6 +67,19 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
             //set lifespan
             SetLifeSpan(10.0f);
         }
+    }
+
+
+    
+}
+
+void ASAICharacter::SetTargetActor(AActor* NewTarget)
+{
+    AAIController* AIC = Cast<AAIController>(GetController());
+    if (AIC)
+    {
+        //dont even need to null check this since we know for a fact this is valid. Cannot be null
+        AIC->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
     }
 
 }

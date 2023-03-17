@@ -40,7 +40,7 @@ public:
 
 	//return if the change succeeded
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool ApplyHealthChange(float Delta);
+	bool ApplyHealthChange(AActor* Instigator, float Delta);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsUnderMaxHealth() const;
