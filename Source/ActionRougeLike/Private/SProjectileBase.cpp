@@ -14,7 +14,7 @@ ASProjectileBase::ASProjectileBase()
 {
 	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
 	SphereComp->SetCollisionProfileName("Projectile");
-
+	//SphereComp->OnComponentHit.__Internal_AddDynamic(this, &ASProjectileBase::OnActorHit);
 	RootComponent = SphereComp;
 
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
@@ -26,6 +26,13 @@ ASProjectileBase::ASProjectileBase()
 	MoveComp->bInitialVelocityInLocalSpace = true;
 	MoveComp->ProjectileGravityScale = 0.0f;
 
+
+	AudioCompFlight = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+	AudioCompFlight->SetupAttachment(RootComponent);
+
+
+	ImpactShakeInnerRadius = 0.0f;
+	ImpactShakeOuterRadius = 1500.0f;
 }
 
 void ASProjectileBase::BeginPlay()

@@ -17,20 +17,20 @@ ASMagicProjectile::ASMagicProjectile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
-	SphereComp->SetCollisionProfileName("Projectile");
+	//SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
+	//SphereComp->SetCollisionProfileName("Projectile");
 	//SphereComp->Simulat
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ASMagicProjectile::OnActorOverlap);
 	SphereComp->OnComponentHit.AddDynamic(this, &ASMagicProjectile::OnCompHit);
 	RootComponent = SphereComp;
 
-	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
+	//EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
 	EffectComp->SetupAttachment(SphereComp);
 
-	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
-	MovementComp->InitialSpeed = 1000.0f;
-	MovementComp->bRotationFollowsVelocity = true;
-	MovementComp->bInitialVelocityInLocalSpace = true;
+	//MoveComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
+	MoveComp->InitialSpeed = 1000.0f;
+	MoveComp->bRotationFollowsVelocity = true;
+	MoveComp->bInitialVelocityInLocalSpace = true;
 
 
 	myRadialForce = CreateDefaultSubobject<URadialForceComponent>("myRadialForce");
@@ -40,8 +40,7 @@ ASMagicProjectile::ASMagicProjectile()
 	myRadialForce->bImpulseVelChange = false;
 	myRadialForce->SetupAttachment(RootComponent);
 
-	AudioCompFlight = CreateDefaultSubobject<UAudioComponent>("AudioComp");
-	AudioCompFlight->SetupAttachment(RootComponent);
+	
 	AudioCompFlight->Play(0.0f);
 	
 }
@@ -89,7 +88,7 @@ void ASMagicProjectile::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherAct
 		
 		//establish radius for myshake
 		//make outer and inner radius float vars editable via inspector
-		UGameplayStatics::PlayWorldCameraShake(this, MyShake, Hit.ImpactPoint, InnerRadius, OuterRadius, Falloff);
+		UGameplayStatics::PlayWorldCameraShake(this, MyShake, Hit.ImpactPoint, ImpactShakeInnerRadius, ImpactShakeOuterRadius, Falloff);
 
 		Destroy();
 	//}

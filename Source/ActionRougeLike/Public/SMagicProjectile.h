@@ -7,6 +7,7 @@
 #include "PhysicsEngine/RadialForceComponent.h"
 #include "Runtime/Engine/Classes/Sound/SoundCue.h"
 #include "Components/AudioComponent.h"
+#include "SProjectileBase.h"
 #include "SMagicProjectile.generated.h"
 
 class USphereComponent;
@@ -16,7 +17,7 @@ class UParticleSystemComponent;
 class AudioComponent;
 
 UCLASS()
-class ACTIONROUGELIKE_API ASMagicProjectile : public AActor
+class ACTIONROUGELIKE_API ASMagicProjectile : public ASProjectileBase
 {
 	GENERATED_BODY()
 	
@@ -32,39 +33,23 @@ protected:
 	UFUNCTION()
 	void OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	USphereComponent* SphereComp;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//USphereComponent* SphereComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UProjectileMovementComponent* MovementComp;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//UProjectileMovementComponent* MovementComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UParticleSystemComponent* EffectComp;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//UParticleSystemComponent* EffectComp;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	UParticleSystem* ImpactVFX;
+	//UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	//UParticleSystem* ImpactVFX;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	URadialForceComponent* myRadialForce;
 
-	//sound cue
-	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
-	USoundCue* ImpactSound;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UAudioComponent* AudioCompFlight;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	TSubclassOf<UCameraShakeBase> MyShake;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	float InnerRadius;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	float OuterRadius;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	float Falloff;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

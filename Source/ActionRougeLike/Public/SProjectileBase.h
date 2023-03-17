@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Runtime/Engine/Classes/Sound/SoundCue.h"
+#include "Components/AudioComponent.h"
 #include "SProjectileBase.generated.h"
 
 class USphereComponent;
@@ -18,17 +20,33 @@ class ACTIONROUGELIKE_API ASProjectileBase : public AActor
 	
 protected:
 
+	//sound cue
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* ImpactSound;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	UParticleSystem* ImpactVFX;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		USphereComponent* SphereComp;
+	USphereComponent* SphereComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		UProjectileMovementComponent* MoveComp;
+	UProjectileMovementComponent* MoveComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		UParticleSystemComponent* EffectComp;
+	UParticleSystemComponent* EffectComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UAudioComponent* AudioCompFlight;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	float ImpactShakeInnerRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	float ImpactShakeOuterRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	float Falloff;
 
 	virtual void OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
@@ -37,8 +55,6 @@ protected:
 	//Not required for assignment but useful for expanding in blueprint later on
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Explode();
-
-	//void ExplodeImplementation();
 
 	virtual void PostInitializeComponents() override;
 
