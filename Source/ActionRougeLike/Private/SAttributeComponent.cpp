@@ -16,6 +16,7 @@ USAttributeComponent::USAttributeComponent()
 	
 }
 
+
 bool USAttributeComponent::IsAlive() const
 {
 	return Health > 0.0f;
@@ -44,4 +45,28 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 bool USAttributeComponent::IsUnderMaxHealth() const
 {
 	return Health < HealthMax;
+}
+
+
+//static func
+USAttributeComponent* USAttributeComponent::GetAttributes(AActor* FromActor)
+{
+	if (FromActor)
+	{
+		return Cast<USAttributeComponent>(FromActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+	}
+
+
+	return nullptr;
+}
+
+bool USAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	USAttributeComponent* AttributeComp = GetAttributes(Actor);
+	if (AttributeComp)
+	{
+		return AttributeComp->IsAlive();
+	}
+	//if we dont have an attribute assume we are dead
+	return false;
 }

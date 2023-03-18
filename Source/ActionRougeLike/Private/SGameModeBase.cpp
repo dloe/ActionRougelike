@@ -36,7 +36,7 @@ void ASGameModeBase::SpawnBotTimerElapsed()
 
 		//will eventually as is alive function
 		//if (Bot->Alive())
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(Bot->GetComponentByClass(USAttributeComponent::StaticClass()));
+		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Bot);
 		//we added this ensure while debugging to show that when we immedtately play we see this hit becasue the attributecomp is still null
 		// never actually added teh attrubute comp to our AI yet
 		// never would increase our count
