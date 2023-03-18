@@ -5,6 +5,15 @@
 #include "AIController.h"
 #include "GameFramework/Character.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include <ActionRougeLike/Public/SAttributeComponent.h>
+
+
+
+USBTTask_RangedAttack::USBTTask_RangedAttack()
+{
+	MaxBulletSpread = 2.0f;
+
+}
 
 EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -30,13 +39,25 @@ EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& O
 			return EBTNodeResult::Failed;
 		}
 
+		//is this still a valid target? still alive?
+		if (!USAttributeComponent::IsActorAlive(TargetActor))
+		{
+			return EBTNodeResult::Failed;
+		}
+
 		//we will then need to get a direciton if we have a target (aka our player)
 		FVector Direction = TargetActor->GetActorLocation() - MuzzleLocation;
 		//turn it into a rotation
+		//we should have a little bit or random offset (aka weapon spread), less accurate
 		FRotator MuzzleRotation = Direction.Rotation();
+
+		MuzzleRotation.Pitch += FMath::RandRange(0.0f, MaxBulletSpread);
+		MuzzleRotation.Yaw += FMath::RandRange(0.0f, MaxBulletSpread);
 
 		FActorSpawnParameters Params;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		Params.Instigator = MyPawn;
+
 
 		AActor* NewProj = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
 
@@ -46,3 +67,4 @@ EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& O
 
 	return EBTNodeResult::Failed;
 }
+

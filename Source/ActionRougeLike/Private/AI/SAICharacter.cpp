@@ -17,7 +17,7 @@ ASAICharacter::ASAICharacter()
 
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-
+    TimeToHitParameterName = "TimeToHit";
 }
 
 void ASAICharacter::PostInitializeComponents()
@@ -49,6 +49,9 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
         {
             SetTargetActor(InstigatorActor);
         }
+
+        //hit flash
+        GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParameterName, GetWorld()->TimeSeconds);
 
         if (NewHealth <= 0.0f)
         {

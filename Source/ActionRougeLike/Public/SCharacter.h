@@ -64,8 +64,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	int HitFlashSpeed;
 
-	//UPROPERTY(EditDefaultsOnly)
-	//FVector4 HitFlashColor;
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParameterName;
 
 	UPROPERTY(EditDefaultsOnly)
 	FColor HitFlashColor;

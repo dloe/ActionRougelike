@@ -43,6 +43,8 @@ ASCharacter::ASCharacter()
 	//get our material instance for flash mat
 	
 	HandSocketName = "Muzzle_01";
+
+	TimeToHitParameterName = "TimeToHit";
 }
 
 
@@ -119,7 +121,7 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 		//change material
 		
 			USkeletalMeshComponent* SkeletalMesh = GetMesh();
-			SkeletalMesh->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+			SkeletalMesh->SetScalarParameterValueOnMaterials(TimeToHitParameterName, GetWorld()->TimeSeconds);
 			//SkeletalMesh->SetParameterValueOnMaterials("HitFlashColor", HitFlashColor);
 			FVector4 ColortoVector = HitFlashColor;
 			SkeletalMesh->SetVectorParameterValueOnMaterials("HitFlashColor", ColortoVector);

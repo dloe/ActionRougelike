@@ -20,15 +20,18 @@ public:
 
 protected:
 
-	void SetTargetActor(AActor* NewTarget);
-
-	virtual void PostInitializeComponents() override;
-
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+		FName TimeToHitParameterName;
+
+	void SetTargetActor(AActor* NewTarget);
+
+	virtual void PostInitializeComponents() override;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
