@@ -6,6 +6,7 @@
 #include "SAttributeComponent.h"
 #include "AI/SAIController.h"
 #include "BrainComponent.h"
+#include "SWorldUserWidget.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 
@@ -48,6 +49,18 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
         if (InstigatorActor)
         {
             SetTargetActor(InstigatorActor);
+        }
+
+        if (ActiveHealthBar == nullptr) {
+            //spawn ui, only spawn when there isnt already a widget
+            ActiveHealthBar = CreateWidget<USWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+            //add it to viewport
+            if (ActiveHealthBar)
+            {
+                //set attached actor (run event constructor)
+                ActiveHealthBar->AttachedActor = this;
+                ActiveHealthBar->AddToViewport();
+            }
         }
 
         //hit flash
