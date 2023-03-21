@@ -13,25 +13,9 @@
 // Sets default values
 ASMagicProjectile::ASMagicProjectile()
 {
+
 	//UE_LOG(LogTemp, Log, TEXT("check"));
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-	//SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
-	//SphereComp->SetCollisionProfileName("Projectile");
-	//SphereComp->Simulat
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ASMagicProjectile::OnActorOverlap);
-	SphereComp->OnComponentHit.AddDynamic(this, &ASMagicProjectile::OnCompHit);
-	RootComponent = SphereComp;
-
-	//EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
-	EffectComp->SetupAttachment(SphereComp);
-
-	//MoveComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
-	MoveComp->InitialSpeed = 1000.0f;
-	MoveComp->bRotationFollowsVelocity = true;
-	MoveComp->bInitialVelocityInLocalSpace = true;
-
 
 	myRadialForce = CreateDefaultSubobject<URadialForceComponent>("myRadialForce");
 	myRadialForce->Radius = 700;
@@ -40,8 +24,8 @@ ASMagicProjectile::ASMagicProjectile()
 	myRadialForce->bImpulseVelChange = false;
 	myRadialForce->SetupAttachment(RootComponent);
 
-	
 	AudioCompFlight->Play(0.0f);
+	Damage = 10;
 	
 }
 //UPrimitiveComponent* OnComponentBeginOverlap, 
@@ -66,8 +50,9 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 	}
 }
 
-void ASMagicProjectile::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ASMagicProjectile::OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	Super::OnActorHit(HitComp, OtherActor, OtherComp,NormalImpulse, Hit);
 	//double check this with answer
 	//FString temp = OtherActor->GetFName().ToString();
 	//UE_LOG(LogTemp, Log, TEXT("Other actor: s%"), temp);
@@ -93,24 +78,5 @@ void ASMagicProjectile::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherAct
 
 		Destroy();
 	//}
-}
-
-// Called when the game starts or when spawned
-void ASMagicProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void ASMagicProjectile::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-}
-
-// Called every frame
-void ASMagicProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 

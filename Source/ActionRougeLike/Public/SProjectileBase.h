@@ -48,6 +48,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	float Falloff;
 
+	UFUNCTION()
 	virtual void OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	//BlueprintNativeEvents = C++ base implementation, can be expanded in blueprints
@@ -57,8 +58,6 @@ protected:
 	void Explode();
 
 	virtual void PostInitializeComponents() override;
-
-	virtual void BeginPlay() override;
 
 public:	
 	// Sets default values for this actor's properties

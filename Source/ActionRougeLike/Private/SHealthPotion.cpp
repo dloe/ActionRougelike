@@ -18,20 +18,6 @@ ASHealthPotion::ASHealthPotion()
 	BaseMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-// Called when the game starts or when spawned
-void ASHealthPotion::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ASHealthPotion::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
 	//make sure our instiator

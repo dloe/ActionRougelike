@@ -31,19 +31,7 @@ protected:
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 	UFUNCTION()
-	void OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//USphereComponent* SphereComp;
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//UProjectileMovementComponent* MovementComp;
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//UParticleSystemComponent* EffectComp;
-
-	//UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	//UParticleSystem* ImpactVFX;
+	virtual void OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	URadialForceComponent* myRadialForce;
@@ -51,14 +39,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	TSubclassOf<UCameraShakeBase> MyShake;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	virtual void PostInitializeComponents() override;
-
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, Category = "Damage")
 	int Damage;

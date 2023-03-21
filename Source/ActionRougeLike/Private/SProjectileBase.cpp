@@ -12,6 +12,7 @@
 // Sets default values
 ASProjectileBase::ASProjectileBase()
 {
+	UE_LOG(LogTemp, Log, TEXT("check1"));
 	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
 	SphereComp->SetCollisionProfileName("Projectile");
 	//SphereComp->OnComponentHit.__Internal_AddDynamic(this, &ASProjectileBase::OnActorHit);
@@ -26,21 +27,11 @@ ASProjectileBase::ASProjectileBase()
 	MoveComp->bInitialVelocityInLocalSpace = true;
 	MoveComp->ProjectileGravityScale = 0.0f;
 
-
 	AudioCompFlight = CreateDefaultSubobject<UAudioComponent>("AudioComp");
 	AudioCompFlight->SetupAttachment(RootComponent);
 
-
 	ImpactShakeInnerRadius = 0.0f;
 	ImpactShakeOuterRadius = 1500.0f;
-}
-
-void ASProjectileBase::BeginPlay()
-{
-	//ignore actor when moving
-	
-
-
 }
 
 void ASProjectileBase::OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
