@@ -103,6 +103,8 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction(interact, IE_Pressed, this, &ASCharacter::PrimaryInteract);
 }
 
+
+
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
 	
@@ -294,5 +296,14 @@ void ASCharacter::TeleportAbility()
 void ASCharacter::TeleportAbility_TimeElasped()
 {
 	SpawnProjectile(TeleportProjectileClass);
+
+}
+
+
+
+//cheat
+void ASCharacter::HealSelf(float Amount /*= 100  */)
+{
+	AttributeComponent->ApplyHealthChange(this, Amount);
 
 }

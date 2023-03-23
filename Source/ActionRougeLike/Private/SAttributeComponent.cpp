@@ -17,6 +17,11 @@ USAttributeComponent::USAttributeComponent()
 }
 
 
+bool USAttributeComponent::Kill(AActor* InstigatorActor)
+{
+	return ApplyHealthChange(InstigatorActor, -GetHealthMax());
+}
+
 bool USAttributeComponent::IsAlive() const
 {
 	return Health > 0.0f;
@@ -24,6 +29,10 @@ bool USAttributeComponent::IsAlive() const
 
 bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 {
+	//godmod
+	if (!GetOwner()->CanBeDamaged())
+		return false;
+
 	float OldHealth = Health;
 
 
@@ -46,6 +55,12 @@ bool USAttributeComponent::IsUnderMaxHealth() const
 {
 	return Health < HealthMax;
 }
+
+float USAttributeComponent::GetHealthMax() const
+{
+	return HealthMax;
+}
+
 
 
 //static func
