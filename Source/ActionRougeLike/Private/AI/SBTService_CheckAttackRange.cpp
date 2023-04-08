@@ -9,7 +9,7 @@ void USBTService_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, u
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	//check distanfe between ai pawn and target actor
+	//check distance between ai pawn and target actor
 
 	UBlackboardComponent* BlackBoardComp = OwnerComp.GetBlackboardComponent();
 	if (ensure(BlackBoardComp))

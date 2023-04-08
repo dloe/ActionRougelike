@@ -12,7 +12,6 @@
 // Sets default values
 ASProjectileBase::ASProjectileBase()
 {
-	UE_LOG(LogTemp, Log, TEXT("check1"));
 	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
 	SphereComp->SetCollisionProfileName("Projectile");
 	//SphereComp->OnComponentHit.__Internal_AddDynamic(this, &ASProjectileBase::OnActorHit);

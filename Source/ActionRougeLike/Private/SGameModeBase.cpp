@@ -14,7 +14,7 @@
 ASGameModeBase::ASGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
-
+	MaxBotCount = 1.0f; //10.0f;
 }
 
 void ASGameModeBase::StartPlay()
@@ -47,9 +47,9 @@ void ASGameModeBase::SpawnBotTimerElapsed()
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Found %i alive bots."), NrOfAliveBots);
+	//UE_LOG(LogTemp, Log, TEXT("Found %i alive bots."), NrOfAliveBots);
 
-	float MaxBotCount = 10.0f;
+	//float MaxBotCount = 1.0f; //10.0f;
 	if (DifficultyCurve)
 	{
 		MaxBotCount = DifficultyCurve->GetFloatValue(GetWorld()->TimeSeconds);
@@ -57,7 +57,7 @@ void ASGameModeBase::SpawnBotTimerElapsed()
 
 	if (NrOfAliveBots >= MaxBotCount)
 	{
-		UE_LOG(LogTemp, Log, TEXT("At max bot count, skipping bot spawn"));
+		//UE_LOG(LogTemp, Log, TEXT("At max bot count, skipping bot spawn"));
 		return;
 	}
 

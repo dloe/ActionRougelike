@@ -55,6 +55,7 @@ EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& O
 		MuzzleRotation.Yaw += FMath::RandRange(0.0f, MaxBulletSpread);
 
 		FActorSpawnParameters Params;
+		//this might be causing a warning, make sure its always
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		Params.Instigator = MyPawn;
 

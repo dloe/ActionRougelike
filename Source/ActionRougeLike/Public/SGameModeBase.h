@@ -36,6 +36,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float SpawnTimerInterval;
 
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	float MaxBotCount;
+
+
+
 	UFUNCTION()
 	void SpawnBotTimerElapsed();
 

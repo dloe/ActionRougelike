@@ -119,7 +119,7 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 	}
 	else if (Delta < 0.0f)                                                //Player took damange but not dead
 	{
-		UE_LOG(LogTemp, Log, TEXT("On Health changed!"));
+		//UE_LOG(LogTemp, Log, TEXT("On Health changed!"));
 		//change material
 		
 			USkeletalMeshComponent* SkeletalMesh = GetMesh();

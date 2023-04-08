@@ -11,8 +11,8 @@ USAttributeComponent::USAttributeComponent()
 	
 	// set to max health on start
 	Health = HealthMax;
-	UE_LOG(LogTemp, Log, TEXT("Starting Health: %f"), Health);
-	UE_LOG(LogTemp, Log, TEXT("Max Health: %f"), HealthMax);
+	//UE_LOG(LogTemp, Log, TEXT("Starting Health: %f"), Health);
+	//UE_LOG(LogTemp, Log, TEXT("Max Health: %f"), HealthMax);
 	
 }
 
@@ -53,6 +53,7 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 
 bool USAttributeComponent::IsUnderMaxHealth() const
 {
+	//UE_LOG(LogTemp, Log, TEXT("Health: %f"), Health);
 	return Health < HealthMax;
 }
 
