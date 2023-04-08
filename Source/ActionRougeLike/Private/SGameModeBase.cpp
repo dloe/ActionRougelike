@@ -8,6 +8,7 @@
 #include <ActionRougeLike/Public/AI/SAICharacter.h>
 #include <ActionRougeLike/Public/SAttributeComponent.h>
 #include "EngineUtils.h"
+#include <ActionRougeLike/Public/SCharacter.h>
 //dont think the eenvqueryrunmode enum is needed to include header
 
 
@@ -24,8 +25,6 @@ void ASGameModeBase::StartPlay()
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
 }
-
-
 
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
@@ -96,6 +95,8 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 	}
 }
 
+
+
 //cheat
 void ASGameModeBase::KillAll()
 {
@@ -108,4 +109,32 @@ void ASGameModeBase::KillAll()
 			AttributeComp->Kill(this); //@fixme pass in player? for kill credit
 		}
 	}
+}
+
+void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
+{
+	ASCharacter* Player = Cast<ASCharacter>(VictimActor);
+	if (Player)
+	{
+		FTimerHandle TimerHandle_RespawnDelay;
+
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(this, "RespawnPlayerElasped", Player->GetController());
+
+
+		float RespawnDelay = 2.0f;
+		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
+	}
+	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
+}
+
+void ASGameModeBase::RespawnPlayerElasped(AController* Controller)
+{
+	if (ensure(Controller))
+	{
+		Controller->UnPossess();
+
+		RestartPlayer(Controller);
+	}
+
 }

@@ -3,6 +3,7 @@
 
 #include "SAttributeComponent.h"
 #include "Math/UnrealMathUtility.h"
+#include <ActionRougeLike/Public/SGameModeBase.h>
 
 // Sets default values for this component's properties
 USAttributeComponent::USAttributeComponent()
@@ -42,6 +43,17 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 
 	float HealthDelta = Health - OldHealth;
 	OnHealthChanged.Broadcast(Instigator, this, Health, HealthDelta);
+
+	//died
+	if (HealthDelta < 0.0f && Health == 0.0f)
+	{
+		ASGameModeBase* GM = GetWorld()->GetAuthGameMode<ASGameModeBase>();
+		if (GM)
+		{
+			GM->OnActorKilled(GetOwner(), Instigator);
+		}
+	}
+
 
 	//UE_LOG(LogTemp, Log, TEXT("New Health: %f"), Health);
 	//OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
