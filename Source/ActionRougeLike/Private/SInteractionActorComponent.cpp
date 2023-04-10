@@ -6,6 +6,7 @@
 #include "SGameplayInterface.h"
 #include "VT/VirtualTextureBuildSettings.h"
 
+static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("su.InteractionDebugDraw"), false, TEXT("Enable Debug lines for Interact Command."), ECVF_Cheat);
 
 // Sets default values for this component's properties
 USInteractionActorComponent::USInteractionActorComponent()
@@ -17,7 +18,6 @@ USInteractionActorComponent::USInteractionActorComponent()
 	// ...
 }
 
-
 // Called when the game starts
 void USInteractionActorComponent::BeginPlay()
 {
@@ -26,7 +26,6 @@ void USInteractionActorComponent::BeginPlay()
 	// ...
 	
 }
-
 
 // Called every frame
 void USInteractionActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -38,6 +37,8 @@ void USInteractionActorComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 void USInteractionActorComponent::PrimaryInteract()
 {
+	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
+
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 
@@ -48,6 +49,7 @@ void USInteractionActorComponent::PrimaryInteract()
 
 	FVector EyeLocation;
 	FRotator EyeRotation;
+	//this can cause a bug with interacting based on our char eye dir and not our crosshair
 	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
 	End = EyeLocation + (EyeRotation.Vector() * 1000); //CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 1000);//EyeLocation + (EyeRotation.Vector() * 1000);
@@ -71,6 +73,9 @@ void USInteractionActorComponent::PrimaryInteract()
 		AActor* HitActor = hit.GetActor();
 		if (HitActor)
 		{
+			FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+			if (bDebugDraw)
+				DrawDebugSphere(GetWorld(), hit.ImpactPoint, radius, 32, LineColor, false, 2.0f);
 			if (HitActor->Implements<USGameplayInterface>())
 			{
 				APawn* MyPawn = Cast<APawn>(MyOwner);
@@ -82,12 +87,9 @@ void USInteractionActorComponent::PrimaryInteract()
 				break;
 			}
 		}
-		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-		DrawDebugSphere(GetWorld(), hit.ImpactPoint, radius, 32, LineColor, false, 2.0f);
 	}
 
 	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-	DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0f, 0, 2.0f);
-
-	
+	if (bDebugDraw)
+		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0f, 0, 2.0f);
 }

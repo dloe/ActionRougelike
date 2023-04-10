@@ -5,6 +5,9 @@
 #include "Math/UnrealMathUtility.h"
 #include <ActionRougeLike/Public/SGameModeBase.h>
 
+
+static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("su.DamageMultiplier"), 1.0f, TEXT("Global Damage Multiplier for Attribute Component."), ECVF_Cheat);
+
 // Sets default values for this component's properties
 USAttributeComponent::USAttributeComponent()
 {
@@ -16,7 +19,6 @@ USAttributeComponent::USAttributeComponent()
 	//UE_LOG(LogTemp, Log, TEXT("Max Health: %f"), HealthMax);
 	
 }
-
 
 bool USAttributeComponent::Kill(AActor* InstigatorActor)
 {
@@ -31,11 +33,19 @@ bool USAttributeComponent::IsAlive() const
 bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 {
 	//godmod
-	if (!GetOwner()->CanBeDamaged())
+	if (!GetOwner()->CanBeDamaged() && Delta < 0.0f)
 		return false;
 
-	float OldHealth = Health;
+	//this does it to EVERYTHING, including player, enemies, explosives, etc
+	//potentially could have mutliple versions to tweak more granularly
+	if (Delta < 0.0f)
+	{
+		float DamageMultiplier = CVarDamageMultiplier.GetValueOnGameThread();
 
+		Delta *= DamageMultiplier;
+	}
+
+	float OldHealth = Health;
 
 	//Health += Delta;
 	//UE_LOG(LogTemp, Log, TEXT("Health: %f"), Health);

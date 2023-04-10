@@ -11,6 +11,8 @@
 #include <ActionRougeLike/Public/SCharacter.h>
 //dont think the eenvqueryrunmode enum is needed to include header
 
+//cvar
+static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
 ASGameModeBase::ASGameModeBase()
 {
@@ -28,6 +30,13 @@ void ASGameModeBase::StartPlay()
 
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
+	//console var
+	if (!CVarSpawnBots.GetValueOnGameThread())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Bot Spawning disabled via cvar 'CVarSpawnBots'."));
+		return;
+	}
+
 	int32 NrOfAliveBots = 0;
 	//
 	for (TActorIterator<ASAICharacter> It(GetWorld()); It; ++It)

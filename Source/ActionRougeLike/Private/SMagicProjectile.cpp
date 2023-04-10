@@ -9,6 +9,7 @@
 #include "Particles/ParticleSystemComponent.h"
 //#include "Camera/CameraShakeBase.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include <SGameplayFunctionLibrary.h>
 
 // Sets default values
 ASMagicProjectile::ASMagicProjectile()
@@ -28,25 +29,31 @@ ASMagicProjectile::ASMagicProjectile()
 	Damage = 10;
 	
 }
+
 //UPrimitiveComponent* OnComponentBeginOverlap, 
 void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(OtherActor && OtherActor != GetInstigator())
 	{
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
-		if(AttributeComp)
-		{
-			//instead of passing this object, lets pass instigator since it should be more useful because it should be the player or the minion
-			AttributeComp->ApplyHealthChange(GetInstigator(), - Damage);
-
-			//spawn emmiter at location
-			UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
-
-			Destroy();
-		}
+	//	USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+	//	if(AttributeComp)
+	//	{
+	//		//instead of passing this object, lets pass instigator since it should be more useful because it should be the player or the minion
+	//		AttributeComp->ApplyHealthChange(GetInstigator(), - Damage);
+	//
+	//		//spawn emmiter at location
+	//		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+	//
+	//		Destroy();
+	//	}
 
 		//UE_LOG(LogTemp, Log, TEXT("OnActorOverlap in projectile"));
 
+
+		if (USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, SweepResult))
+		{
+			Explode();
+		}
 	}
 }
 

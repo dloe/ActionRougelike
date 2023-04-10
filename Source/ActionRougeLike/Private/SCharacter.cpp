@@ -103,8 +103,6 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction(interact, IE_Pressed, this, &ASCharacter::PrimaryInteract);
 }
 
-
-
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
 	
@@ -131,9 +129,6 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 			SkeletalMesh->SetScalarParameterValueOnMaterials("HitFlashSpeed", HitFlashSpeed);
 
 	}
-	
-
-
 }
 
 void ASCharacter::PrimaryAttack()
@@ -299,11 +294,17 @@ void ASCharacter::TeleportAbility_TimeElasped()
 
 }
 
-
-
 //cheat
 void ASCharacter::HealSelf(float Amount /*= 100  */)
 {
 	AttributeComponent->ApplyHealthChange(this, Amount);
 
+}
+
+//override from 
+FVector ASCharacter::GetPawnViewLocation() const
+{
+	//Super::GetPawnViewLocation();
+
+	return CameraComp->GetComponentLocation(); //FVector();
 }

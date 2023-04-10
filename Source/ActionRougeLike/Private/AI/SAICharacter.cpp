@@ -8,6 +8,8 @@
 #include "BrainComponent.h"
 #include "SWorldUserWidget.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 // Sets default values
@@ -17,6 +19,10 @@ ASAICharacter::ASAICharacter()
     AttributeComponent = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+    //fix an issue with collision on our capsule collider
+    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+    GetMesh()->SetGenerateOverlapEvents(true);
 
     TimeToHitParameterName = "TimeToHit";
 }
@@ -79,6 +85,12 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
             GetMesh()->SetAllBodiesSimulatePhysics(true);
             //need to set physics and collision to prevent unwanted issues with things falling through floor, etc
             GetMesh()->SetCollisionProfileName("Ragdoll");
+
+
+            //remove the stuff our ai leaves behind (like capsules, etc)
+            GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            //disable this char movement completely (gravity)
+            GetCharacterMovement()->DisableMovement();
 
             //set lifespan
             SetLifeSpan(10.0f);
