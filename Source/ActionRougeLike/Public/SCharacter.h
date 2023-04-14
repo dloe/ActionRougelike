@@ -6,13 +6,16 @@
 #include "SAttributeComponent.h"
 #include "SInteractionActorComponent.h"
 #include "GameFramework/Character.h"
+#include <SActionComponent.h>
 #include "Particles/ParticleSystemComponent.h"
 #include "SCharacter.generated.h"
+
 
 class UCameraComponent;
 class USpringArmComponent;
 class USInteractionComponent;
 class UAnimMontage;
+class USActionComponent;
 
 UCLASS()
 class ACTIONROUGELIKE_API ASCharacter : public ACharacter
@@ -24,27 +27,7 @@ public:
 	ASCharacter();
 
 protected:
-	
-	UPROPERTY(EditAnywhere, Category = "Attack")
-		TSubclassOf<AActor> ProjectileClass;
 
-	UPROPERTY(EditAnywhere, Category = "Attack")
-		TSubclassOf<AActor>BlackholeProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-		TSubclassOf<AActor>TeleportProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-		UAnimMontage* AttackAnim;
-
-	//attack timers
-	FTimerHandle TimerHandle_PrimaryAttack;
-	FTimerHandle TimerHandle_BlackholeAttack;
-	FTimerHandle TimerHandle_TeleportAttack;
-
-	//particle effects on spell spawn
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	UParticleSystem* CastSpellVFX;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* EffectSpellCastComp;
 
@@ -61,6 +44,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
+	USActionComponent* ActionComp;
+
 	UPROPERTY(EditDefaultsOnly)
 	int HitFlashSpeed;
 
@@ -70,8 +56,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	FColor HitFlashColor;
 
-	UPROPERTY(VisibleAnywhere, Category = "Effects")
-	FName HandSocketName;
+	//actions
+	void SprintStart();
+	void SprintStop();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -79,21 +66,13 @@ protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
 
-	void SpawnProjectile(TSubclassOf<AActor> classToSpawn);
-
 	void BlackholeAttack();
 
 	void TeleportAbility();
 
-	void TeleportAbility_TimeElasped();
-
-	void BlackholeAttack_TimeElasped();
-
 	void PrimaryAttack();
 
 	void PrimaryInteract();
-
-	void PrimaryAttack_TimeElasped();
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);

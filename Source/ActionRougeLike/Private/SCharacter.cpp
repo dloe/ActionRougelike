@@ -10,7 +10,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include <ActionRougeLike/Public/SAttributeComponent.h>
-
+#include "SActionComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -33,6 +33,8 @@ ASCharacter::ASCharacter()
 
 	AttributeComponent = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
+	ActionComp = CreateDefaultSubobject<USActionComponent>("ActionComp");
+
 	//rotate to whatever we are moving towards
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
@@ -40,13 +42,8 @@ ASCharacter::ASCharacter()
 
 	bUseControllerRotationYaw = false;
 
-	//get our material instance for flash mat
-	
-	HandSocketName = "Muzzle_01";
-
 	TimeToHitParameterName = "TimeToHit";
 }
-
 
 void ASCharacter::PostInitializeComponents()
 {
@@ -101,7 +98,35 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	//interactjion
 	const FName interact = "PrimaryInteract";
 	PlayerInputComponent->BindAction(interact, IE_Pressed, this, &ASCharacter::PrimaryInteract);
+
+	//actions
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASCharacter::SprintStop);
 }
+
+//movement
+void ASCharacter::MoveForward(float value)
+{
+	FRotator ControlBot = GetControlRotation();
+	ControlBot.Pitch = 0.0f;
+	ControlBot.Roll = 0.0f;
+	AddMovementInput(ControlBot.Vector(), value);
+
+
+}
+void ASCharacter::MoveRight(float value)
+{
+	FRotator ControlBot = GetControlRotation();
+	ControlBot.Pitch = 0.0f;
+	ControlBot.Roll = 0.0f;
+
+	// X forward (red), Y is right (Green), z is up (blue) (unlike unity)
+
+	const FVector RightVector = FRotationMatrix(ControlBot).GetScaledAxis(EAxis::Y);
+
+	AddMovementInput(RightVector, value);
+}
+
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
@@ -133,13 +158,7 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 
 void ASCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
-
-
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElasped, 0.2f);
-
-	
-
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 
 }
 
@@ -152,146 +171,24 @@ void ASCharacter::PrimaryInteract()
 	
 }
 
-//function that is called once time is done (for timer)
-void ASCharacter::PrimaryAttack_TimeElasped()
-{
-	SpawnProjectile(ProjectileClass);
-
-
-
-}
-
-//movement
-void ASCharacter::MoveForward(float value)
-{
-	FRotator ControlBot = GetControlRotation();
-	ControlBot.Pitch = 0.0f;
-	ControlBot.Roll = 0.0f;
-	AddMovementInput(ControlBot.Vector(), value);
-
-
-}
-void ASCharacter::MoveRight(float value)
-{
-	FRotator ControlBot = GetControlRotation();
-	ControlBot.Pitch = 0.0f;
-	ControlBot.Roll = 0.0f;
-
-	// X forward (red), Y is right (Green), z is up (blue) (unlike unity)
-
-	const FVector RightVector = FRotationMatrix(ControlBot).GetScaledAxis(EAxis::Y);
-
-	AddMovementInput(RightVector, value);
-}
-
-void ASCharacter::SpawnProjectile(TSubclassOf <AActor> classToSpawn)
-{
-	if (ensureAlways(classToSpawn))
-	{
-		//use handsocketname instead of muzzle_01
-		const FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
-
-		//EPSCPoolMethod PoolingMethod; //defaults to none
-		//attach location can be KeepWorldPosition or KeepRelativeOffset
-		// scale shouldnt be needed if we use keepworldposition
-		
-		//have particle effect in players hand when shooting projectile
-		//should be where our hand socket is, where the projectile spawns in
-		// cast root component as a scene component?
-		//UParticleSystem* EmitterTemplate, USceneComponent* AttachToComponent, FName AttachPointName, FVector Location, FRotator Rotation, FVector Scale, EAttachLocation::Type LocationType, bool bAutoDestroy, EPSCPoolMethod PoolingMethod, bool bAutoActivateSystem
-		// instructor used CastSpellVFX, GetMesh,HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget
-		//UGameplayStatics::SpawnEmitterAttached(CastSpellVFX, GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
-		//UGameplayStatics::SpawnEmitterAttached(CastSpellVFX, GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true, EPSCPoolMethod::None, true);
-		UGameplayStatics::SpawnEmitterAttached(CastSpellVFX, GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-
-
-		FCollisionShape Shape;
-		Shape.SetSphere(20.0f);
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(this);
-
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
-
-
-		//for trace
-		float basicTraceRange = 5000;
-
-		//the crosshair is at the forward vector of camera so might as well just use that
-		FVector TraceStart = CameraComp->GetComponentLocation();
-
-		//endpoint far into the look at distance (not to far, still somewhat towards crosshair on a miss)
-		FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * basicTraceRange);
-		
-		FHitResult hitCam;
-		//if we dont hit anything just use the end of the trace line
-		FVector projectileEndLocale = TraceEnd;
-		//if(GetWorld()->LineTraceSingleByObjectType(hitCam, TraceStart, TraceEnd, ObjectQueryParams))
-		if (GetWorld()->SweepSingleByObjectType(hitCam, TraceStart, TraceEnd, FQuat::Identity, ObjectQueryParams, Shape, Params))
-		{
-			//if we got a hit, then we now have a start (handlocation), and end point (hitCam.ImpactPoint)
-			projectileEndLocale = hitCam.ImpactPoint;
-		}
-
-		//OLD - rotation is looking at that point we now have
-		//FRotator ProjectileSpawnRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, projectileEndLocale);
-
-		//more accurate version
-		FRotator ProjRotation = FRotationMatrix::MakeFromX(projectileEndLocale - HandLocation).Rotator();
-
-
-		//replaced GetControlRotation with our new target rotation
-		const FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
-		GetWorld()->SpawnActor<AActor>(classToSpawn, SpawnTM, SpawnParams);
-	}
-}
-
 //blackhole assignment 2
 void ASCharacter::BlackholeAttack()
 {
-	UE_LOG(LogTemp, Log, TEXT("BLACKHOLE ATTACK!"));
-	//UE_LOG(LogTemp, Warning, TEXT("BH ATtACK!"));
-	//copy down primary attack once we see the print
-
-	PlayAnimMontage(AttackAnim);
-
-
-	GetWorldTimerManager().SetTimer(TimerHandle_BlackholeAttack, this, &ASCharacter::BlackholeAttack_TimeElasped, 0.2f);
-
-}
-
-//might make the spawnable projectile a passable var to make this more optimized than copying a function
-//function that is called once time is done (for timer)
-void ASCharacter::BlackholeAttack_TimeElasped()
-{
-	SpawnProjectile(BlackholeProjectileClass);
+	ActionComp->StartActionByName(this, "Blackhole");
 
 }
 
 void ASCharacter::TeleportAbility()
 {
-	UE_LOG(LogTemp, Log, TEXT("Teleport Ability!"));
-	//UE_LOG(LogTemp, Warning, TEXT("BH ATtACK!"));
-	//copy down primary attack once we see the print
-
-	PlayAnimMontage(AttackAnim);
-
-
-	GetWorldTimerManager().SetTimer(TimerHandle_TeleportAttack, this, &ASCharacter::TeleportAbility_TimeElasped, 0.2f);
-
-}
-
-void ASCharacter::TeleportAbility_TimeElasped()
-{
-	SpawnProjectile(TeleportProjectileClass);
-
+//	UE_LOG(LogTemp, Log, TEXT("Teleport Ability!"));
+//	//UE_LOG(LogTemp, Warning, TEXT("BH ATtACK!"));
+//	//copy down primary attack once we see the print
+//
+//	PlayAnimMontage(AttackAnim);
+//
+//
+//	GetWorldTimerManager().SetTimer(TimerHandle_TeleportAttack, this, &ASCharacter::TeleportAbility_TimeElasped, 0.2f);
+	ActionComp->StartActionByName(this, "Dash");
 }
 
 //cheat
@@ -307,4 +204,15 @@ FVector ASCharacter::GetPawnViewLocation() const
 	//Super::GetPawnViewLocation();
 
 	return CameraComp->GetComponentLocation(); //FVector();
+}
+
+//actions
+void ASCharacter::SprintStart()
+{
+	ActionComp->StartActionByName(this, "Sprint");
+}
+
+void ASCharacter::SprintStop()
+{
+	ActionComp->StopActionByName(this, "Sprint");
 }
