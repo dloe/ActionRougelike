@@ -11,7 +11,6 @@ USAction_ProjectileAttack::USAction_ProjectileAttack()
 	AttacAnimDelay = 0.2f;
 }
 
-
 void USAction_ProjectileAttack::StartAction_Implementation(AActor* Instigator)
 {
 	Super::StartAction_Implementation(Instigator);
@@ -20,16 +19,16 @@ void USAction_ProjectileAttack::StartAction_Implementation(AActor* Instigator)
 	if (Character)
 	{
 		Character->PlayAnimMontage(AttackAnim);
+
 		UGameplayStatics::SpawnEmitterAttached(CastingEffects, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
 
 		FTimerHandle TimerHandle_AttackDelay;
 		FTimerDelegate Delegate;
-		Delegate.BindUFunction(this, "AttackDelay_Elapsed", Character);
+		Delegate.BindUFunction(this, "AttackDelay_Elasped", Character);
 
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_AttackDelay, Delegate, AttacAnimDelay, false);
 	}
 }
-
 
 void USAction_ProjectileAttack::AttackDelay_Elasped(ACharacter* InstigatorCharacter)
 {

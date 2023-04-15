@@ -34,7 +34,7 @@ protected:
 
 public:
 	//UFUNCTION(BlueprintNativeEvent, Category = "Action")
-	void StartAction_Implementation(AActor* Instigator);
+	virtual void StartAction_Implementation(AActor* Instigator) override;
 
 	USAction_ProjectileAttack();
 
