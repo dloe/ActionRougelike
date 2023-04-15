@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 #include "SActionComponent.generated.h"
+
 
 class USAction;
 
@@ -16,6 +18,10 @@ class ACTIONROUGELIKE_API USActionComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
+	FGameplayTagContainer ActiveGameplayTags;
+
 	// Sets default values for this component's properties
 	USActionComponent();
 
