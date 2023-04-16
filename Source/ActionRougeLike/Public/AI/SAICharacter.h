@@ -5,11 +5,13 @@
 #include "CoreMinimal.h"
 #include "SAttributeComponent.h"
 #include "GameFramework/Character.h"
+#include <SActionComponent.h>
 #include "SAICharacter.generated.h"
 
 class UPawnSensingComponent;
 class UUserWidget;
 class USWorldUserWidget;
+class USActionComponent;
 
 UCLASS()
 class ACTIONROUGELIKE_API ASAICharacter : public ACharacter
@@ -36,9 +38,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 		FName TimeToHitParameterName;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USActionComponent* ActionComp;
+
 	void SetTargetActor(AActor* NewTarget);
 
 	virtual void PostInitializeComponents() override;
+
+
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);

@@ -10,13 +10,14 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include <SActionComponent.h>
 
 // Sets default values
 ASAICharacter::ASAICharacter()
 {
     PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
     AttributeComponent = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
+    ActionComp = CreateDefaultSubobject<USActionComponent>("ActionComp");
 
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 

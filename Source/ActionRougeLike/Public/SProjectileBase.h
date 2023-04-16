@@ -6,7 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "Runtime/Engine/Classes/Sound/SoundCue.h"
 #include "Components/AudioComponent.h"
+#include <Runtime/Engine/Classes/PhysicsEngine/RadialForceComponent.h>
 #include "SProjectileBase.generated.h"
+
 
 class USphereComponent;
 class UProjectileMovementComponent;
@@ -47,6 +49,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	float Falloff;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		URadialForceComponent* myRadialForce;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+		TSubclassOf<UCameraShakeBase> MyShake;
 
 	UFUNCTION()
 	virtual void OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
