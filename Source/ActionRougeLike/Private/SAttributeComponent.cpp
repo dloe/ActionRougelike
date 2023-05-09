@@ -17,7 +17,7 @@ USAttributeComponent::USAttributeComponent()
 	Health = HealthMax;
 	//UE_LOG(LogTemp, Log, TEXT("Starting Health: %f"), Health);
 	//UE_LOG(LogTemp, Log, TEXT("Max Health: %f"), HealthMax);
-	
+	OnHealthChanged.Broadcast(NULL, this, Health, 0);
 }
 
 bool USAttributeComponent::Kill(AActor* InstigatorActor)

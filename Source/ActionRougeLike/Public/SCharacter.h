@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include <SActionComponent.h>
 #include "Particles/ParticleSystemComponent.h"
+#include "SPlayerState.h"
 #include "SCharacter.generated.h"
 
 
@@ -31,7 +32,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* EffectSpellCastComp;
 
-
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 	UPROPERTY(VisibleAnywhere)
@@ -46,6 +46,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	USActionComponent* ActionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Player")
+	ASPlayerState* PState;
 
 	UPROPERTY(EditDefaultsOnly)
 	int HitFlashSpeed;

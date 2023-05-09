@@ -11,6 +11,7 @@
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include <ActionRougeLike/Public/SAttributeComponent.h>
 #include "SActionComponent.h"
+#include "SPlayerState.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -38,7 +39,7 @@ ASCharacter::ASCharacter()
 	//rotate to whatever we are moving towards
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
-	//PlayerController = GetWorld()->GetFirstPlayerController();
+	
 
 	bUseControllerRotationYaw = false;
 
@@ -59,6 +60,11 @@ void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	PState = Cast<ASPlayerState>(PC->PlayerState);
+	//debug print out our credit amount
+	//int Credits = PState->GetCredits();
+	UE_LOG(LogTemp, Log, TEXT("Player Credits on Start: %d"), PState->GetCredits());
 }
 
 // Called every frame

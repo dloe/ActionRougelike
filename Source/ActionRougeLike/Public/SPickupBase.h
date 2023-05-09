@@ -50,4 +50,6 @@ public:
 	virtual void OnTriggerTimer();
 
 	virtual void ShowPowerup(bool state);
+
+	void HideAndCooldownPowerup();
 };

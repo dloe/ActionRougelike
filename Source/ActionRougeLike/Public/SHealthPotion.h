@@ -20,10 +20,12 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	float HealthIncrease;
+	UPROPERTY(EditDefaultsOnly)
+	float UseCost;
+
 
 public:	
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
-	void OnTriggerTimer() override;
 };

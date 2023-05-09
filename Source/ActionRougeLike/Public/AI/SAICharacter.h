@@ -22,7 +22,13 @@ public:
 	// Sets default values for this character's properties
 	ASAICharacter();
 
+	UPROPERTY(EditAnywhere, Category = "Loot")
+		//TSubclassOf<AActor> CoinPickupClass;
+		int32 CreditsOnKill;
+	
+
 protected:
+	
 
 	USWorldUserWidget* ActiveHealthBar;
 
@@ -36,10 +42,13 @@ protected:
 	USAttributeComponent* AttributeComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
-		FName TimeToHitParameterName;
+	FName TimeToHitParameterName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USActionComponent* ActionComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	float DeathReward;
 
 	void SetTargetActor(AActor* NewTarget);
 

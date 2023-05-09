@@ -8,24 +8,32 @@
 #include <ActionRougeLike/Public/AI/SAICharacter.h>
 #include <ActionRougeLike/Public/SAttributeComponent.h>
 #include "EngineUtils.h"
+#include "GameFramework/PlayerState.h"
 #include <ActionRougeLike/Public/SCharacter.h>
 //dont think the eenvqueryrunmode enum is needed to include header
 
 //cvar
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
+
+
 ASGameModeBase::ASGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
 	MaxBotCount = 1.0f; //10.0f;
+	WorldSpawnSet = false;
+	//assign PlayerStateClass
+	PlayerStateClass = ASPlayerState::StaticClass();
 }
 
 void ASGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-
+	SpawnPowerups();
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
+
+
 }
 
 void ASGameModeBase::SpawnBotTimerElapsed()
@@ -76,11 +84,77 @@ void ASGameModeBase::SpawnBotTimerElapsed()
 	//never really use the last param
 	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
 
-	QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnQueryCompleted);
+	QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnQueryBotSpawnCompleted);
 
 }
 
-void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+void ASGameModeBase::OnQueryPowerupSpawnCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+{
+	//not using ensure because it would be triggering every 2 frames and having this check is instantatious (more useful this way)
+	if (QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn Powerups EQS Query Failed!"));
+		return;
+	}
+
+	//give us the result and location for where we want to spawn
+	//status tells us if it fails, etc
+	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
+
+	//keep used locations to easily check distance btween points
+	TArray<FVector> UsedLocations;
+
+	int32 SpawnCounter = 0;
+
+	//break out if we reached the disired count or if we have no more potential positons remaining
+	while (SpawnCounter < DesiredPowerupCount && Locations.Num() > 0)
+	{
+		int32 RandomLocationIndex = FMath::RandRange(0, Locations.Num() - 1);
+
+		FVector PickedLocation = Locations[RandomLocationIndex];
+
+		//check min distance requirement
+		bool bValidLocation = true;
+
+		for (FVector OtherLocation : UsedLocations)
+		{
+			float DistanceTo = (PickedLocation - OtherLocation).Size();
+
+			if (DistanceTo < RequiredPowerupDistance)
+			{
+				//show skipped locations due to distance
+				//DrawDebugSphere(GetWorld(), PickedLocation, 50.0f, 20, FColor::Red, false, 10.0f);
+
+				//too close, skip to next attempt
+				bValidLocation = false;
+				break;
+			}
+		}
+
+
+		//Failed the distance test
+		if (!bValidLocation)
+		{
+			//go back to start of while loop and try again (assuming we got that false in correct location that is to close to each other
+			//helpful bit of logic to have in my backpocket for future projects
+			continue;
+		}
+
+
+		//Pick a random powerup class
+		int32 RandomClassIndex = FMath::RandRange(0, PowerupClasses.Num() - 1);
+		TSubclassOf<AActor> RandomPowerupClass = PowerupClasses[RandomClassIndex];
+
+		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
+
+		//keep for distance checks
+		UsedLocations.Add(PickedLocation);
+		SpawnCounter++;
+	}
+
+}
+
+void ASGameModeBase::OnQueryBotSpawnCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
 {
 	//not using ensure because it would be triggering every 2 frames and having this check is instantatious (more useful this way)
 	if (QueryStatus != EEnvQueryStatus::Success)
@@ -96,7 +170,6 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 	//check our locations
 	if (Locations.IsValidIndex(0))
 	{
-
 		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
 
 		//track all used spawn locations
@@ -105,6 +178,17 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 }
 
 
+void ASGameModeBase::SpawnPowerups()
+{
+	if (ensure(PowerupClasses.Num() > 0))
+	{
+		UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, PowerupSpawnQuery, this, EEnvQueryRunMode::AllMatching, nullptr);
+		if (ensure(QueryInstance))
+		{
+			QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnQueryPowerupSpawnCompleted);
+		}
+	}
+}
 
 //cheat
 void ASGameModeBase::KillAll()
@@ -120,13 +204,23 @@ void ASGameModeBase::KillAll()
 	}
 }
 
+//question to ponder, would the score for each minion be based in gamemodebase or in the minion
+//perhaps there could be a multiplier or other details that would make this function have a better place here
+//in the gamemodebase script
+void ASGameModeBase::KillMinionEvent(AActor* InstigatorActor, int MinionCost)
+{
+	APlayerController* PC = Cast<APlayerController>(InstigatorActor->GetInstigatorController());
+	ASPlayerState* PS = Cast<ASPlayerState>(PC->PlayerState);
+	PS->AddCredits(MinionCost);
+
+}
+
 void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 {
 	ASCharacter* Player = Cast<ASCharacter>(VictimActor);
 	if (Player)
 	{
 		FTimerHandle TimerHandle_RespawnDelay;
-
 		FTimerDelegate Delegate;
 		Delegate.BindUFunction(this, "RespawnPlayerElasped", Player->GetController());
 
@@ -135,6 +229,20 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
 	}
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
+
+
+	//Give credits for kill
+	//may need to dive into this more as things get more complicated
+	APawn* KillerPawn = Cast<APawn>(Killer);
+	if (KillerPawn)
+	{
+		ASPlayerState* PS = KillerPawn->GetPlayerState<ASPlayerState>();
+		ASAICharacter* CH = Cast<ASAICharacter>(VictimActor);
+		if (PS && CH)
+		{
+			PS->AddCredits(CH->CreditsOnKill);
+		}
+	}
 }
 
 void ASGameModeBase::RespawnPlayerElasped(AController* Controller)
@@ -147,3 +255,5 @@ void ASGameModeBase::RespawnPlayerElasped(AController* Controller)
 	}
 
 }
+
+

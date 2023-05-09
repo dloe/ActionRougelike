@@ -7,7 +7,9 @@
 #include "SAttributeComponent.generated.h"
 
 class USAttributeComponent;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthCHanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewHealth, float, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewHealth, float, Delta);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnCreditChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewCredits, float, Delta);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROUGELIKE_API USAttributeComponent : public UActorComponent
@@ -46,7 +48,10 @@ public:
 	bool IsAlive() const;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnHealthCHanged OnHealthChanged;
+	FOnHealthChanged OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCreditChanged OnCreditChanged;
 
 	//return if the change succeeded
 	UFUNCTION(BlueprintCallable, Category = "Attributes")

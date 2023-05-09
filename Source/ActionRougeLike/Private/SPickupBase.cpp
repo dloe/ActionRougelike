@@ -49,7 +49,7 @@ void ASPickupBase::Interact_Implementation(APawn* InstigatorPawn)
 		if (AttributeComp)
 		{
 			//base logic (could branch this off into a new function our children can override, then we dont have to do this few line setup
-
+			HideAndCooldownPowerup();
 
 		}
 	}
@@ -60,7 +60,7 @@ void ASPickupBase::OnTriggerTimer()
 	UE_LOG(LogTemp, Log, TEXT("No longer triggered..."));
 	//set bool and mesh
 	Triggered = false;
-
+	ShowPowerup(true);
 	//set mesh invisible and turn off interaction!
 	//BaseMesh->SetStaticMesh(NormalPotionMesh);
 	BaseMesh->SetVisibility(true, true);
@@ -80,4 +80,12 @@ void ASPickupBase::ShowPowerup(bool state)
 	//turn on overlap events
 	SetActorEnableCollision(state);
 
+}
+
+void ASPickupBase::HideAndCooldownPowerup()
+{
+	Triggered = true;
+	ShowPowerup(false);
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ASPickupBase::OnTriggerTimer, TriggerDelay);
 }

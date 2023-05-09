@@ -3,14 +3,15 @@
 #include "SHealthPotion.h"
 #include "GameFramework/Actor.h"
 #include "SAttributeComponent.h"
+#include "SPlayerState.h"
 
 // Sets default values
 ASHealthPotion::ASHealthPotion()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	HealthIncrease = 10;
+	UseCost = 20;
 
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
 	RootComponent = BaseMesh;
@@ -20,36 +21,33 @@ ASHealthPotion::ASHealthPotion()
 
 void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
+	UE_LOG(LogTemp, Log, TEXT("Sees health potion"));
 	//make sure our instiator
 	if (!ensure(InstigatorPawn))// or InstigatorPawn && InstigatorPawn != GetInstigator())
 	{
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(InstigatorPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
-		if (ensure(AttributeComp) && AttributeComp->IsUnderMaxHealth() && !Triggered)
-		{
-			//if players health is below max AND hasnt already been triggered within 10 sec
-
-				UE_LOG(LogTemp, Log, TEXT("Health Potion: Triggered!"));
-				//start timer for 10 seconds, trigger = true (once timer ends, set bool and mesh)
-				Triggered = true;
-				ShowPowerup(false);
-
-				GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ASHealthPotion::OnTriggerTimer, TriggerDelay);
-			
-				AttributeComp->ApplyHealthChange(this, HealthIncrease);
-		}
+		return;
 	}
+		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(InstigatorPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
 
-}
+		if (ASPlayerState* PS = Cast<ASPlayerState>(InstigatorPawn->GetPlayerState())) {
+			//UE_LOG(LogTemp, Log, TEXT("Player Credits before addition: %d"), PS->GetCredits());
+			//if (PS->GetCredits() >= UseCost) {
 
-//runs when our timer ends
-void ASHealthPotion::OnTriggerTimer()
-{
-	UE_LOG(LogTemp, Log, TEXT("No longer triggered..."));
-	//set bool and mesh
-	Triggered = false;
+				if (PS->RemoveCredits(UseCost) && AttributeComp->IsUnderMaxHealth() && !Triggered && AttributeComp->ApplyHealthChange(this, HealthIncrease))
+				{
+					//if players health is below max AND hasnt already been triggered within 10 sec
 
-	ShowPowerup(true);
+					//UE_LOG(LogTemp, Log, TEXT("Health Potion: Triggered!"));
+					//start timer for 10 seconds, trigger = true (once timer ends, set bool and mesh)
+					HideAndCooldownPowerup();
+					//UE_LOG(LogTemp, Log, TEXT("Player Credits after potion: %d"), PS->GetCredits());
+				}
+				else {
+					UE_LOG(LogTemp, Log, TEXT("Health Potion: CANT TRIGGER!"));
+				}
+			//}
+			//else { UE_LOG(LogTemp, Log, TEXT("Health Potion: to expensive!")); }
 
-	GetWorldTimerManager().ClearTimer(TimerHandle);
+		}
 }
 

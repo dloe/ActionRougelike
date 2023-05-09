@@ -10,6 +10,8 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "SPlayerState.h"
+#include <ActionRougeLike/Public/SGameModeBase.h>
 #include <SActionComponent.h>
 
 // Sets default values
@@ -25,7 +27,9 @@ ASAICharacter::ASAICharacter()
     GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
     GetMesh()->SetGenerateOverlapEvents(true);
 
+    CreditsOnKill = 20;
     TimeToHitParameterName = "TimeToHit";
+    DeathReward = 10;
 }
 
 void ASAICharacter::PostInitializeComponents()
@@ -95,6 +99,20 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 
             //set lifespan
             SetLifeSpan(10.0f);
+
+            //drop currency on death (spawn coin pickup)
+            FActorSpawnParameters SpawnParams;
+            SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            SpawnParams.Instigator = this;
+
+            const FTransform SpawnTM = FTransform(this->GetActorRotation(), this->GetActorLocation());
+            
+            //on minion death event via SGameModeBase
+            ASGameModeBase* GM = GetWorld()->GetAuthGameMode<ASGameModeBase>();
+            if (GM)
+            {
+                GM->KillMinionEvent(InstigatorActor, CreditsOnKill);
+            }
         }
     }
 

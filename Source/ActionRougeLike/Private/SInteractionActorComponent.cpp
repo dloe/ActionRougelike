@@ -37,6 +37,7 @@ void USInteractionActorComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 void USInteractionActorComponent::PrimaryInteract()
 {
+	
 	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
 
 	FCollisionObjectQueryParams ObjectQueryParams;
@@ -67,17 +68,18 @@ void USInteractionActorComponent::PrimaryInteract()
 	shape.SetSphere(radius);
 	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End, FQuat::Identity, ObjectQueryParams, shape);
 
+	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
 
 	for(FHitResult hit : Hits)
 	{
 		AActor* HitActor = hit.GetActor();
 		if (HitActor)
 		{
-			FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
 			if (bDebugDraw)
 				DrawDebugSphere(GetWorld(), hit.ImpactPoint, radius, 32, LineColor, false, 2.0f);
 			if (HitActor->Implements<USGameplayInterface>())
 			{
+				//UE_LOG(LogTemp, Log, TEXT("Interacting with HitActor"));
 				APawn* MyPawn = Cast<APawn>(MyOwner);
 				//is ok if null ptr 
 
@@ -89,7 +91,8 @@ void USInteractionActorComponent::PrimaryInteract()
 		}
 	}
 
-	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+	//FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+
 	if (bDebugDraw)
 		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0f, 0, 2.0f);
 }
