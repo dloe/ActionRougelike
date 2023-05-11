@@ -33,6 +33,9 @@ protected:
 
 public:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	bool bAutoStart;
+	
 	//Action nickname to start/stop without a reference to the object
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	FName ActionName;

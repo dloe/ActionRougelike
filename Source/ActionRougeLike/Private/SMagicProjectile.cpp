@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include <SGameplayFunctionLibrary.h>
+#include "SActionEffect.h"
 #include <SActionComponent.h>
 
 // Sets default values
@@ -31,6 +32,10 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	if(OtherActor && OtherActor != GetInstigator())
 	{
+		//static FGameplayTag Tag = FGameplayTag::RequestGameplayTag("Status.Parrying");
+
+
+
 		//UE_LOG(LogTemp, Log, TEXT("OnActorOverlap in projectile"));
 
 		USActionComponent* ActionComp = Cast<USActionComponent>(OtherActor->GetComponentByClass(USActionComponent::StaticClass()));
@@ -49,6 +54,12 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		if (USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
 			Explode();
+
+			//apply burning
+			if (ActionComp)
+			{
+				ActionComp->AddAction(GetInstigator(), BurningActionClass);
+			}
 		}
 	}
 }
