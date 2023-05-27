@@ -37,9 +37,18 @@ void USInteractionActorComponent::TickComponent(float DeltaTime, ELevelTick Tick
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	//we might not need it in tick since it doesnt need to run every tick (maybe like on a timer?)
-	FindBestInteractable();
+	//figure out if we are the owning client, only run this on the controller we are currently controllering 
+	APawn* MyPawn = Cast<APawn>(GetOwner());
+	if (MyPawn->IsLocallyControlled())
+	{
+
+		//we might not need it in tick since it doesnt need to run every tick (maybe like on a timer?)
+		FindBestInteractable();
+	}
+	
 }
+
+
 
 void USInteractionActorComponent::FindBestInteractable()
 {
@@ -85,7 +94,7 @@ void USInteractionActorComponent::FindBestInteractable()
 		if (HitActor)
 		{
 			if (bDebugDraw)
-				DrawDebugSphere(GetWorld(), hit.ImpactPoint, TraceRadius, 32, LineColor, false, 2.0f);
+				DrawDebugSphere(GetWorld(), hit.ImpactPoint, TraceRadius, 32, LineColor, false, 0.2f);
 			if (HitActor->Implements<USGameplayInterface>())
 			{
 				//UE_LOG(LogTemp, Log, TEXT("Interacting with HitActor"));
@@ -137,14 +146,21 @@ void USInteractionActorComponent::FindBestInteractable()
 
 void USInteractionActorComponent::PrimaryInteract()
 {
-	if (FocusedActor == nullptr) {
+	ServerInteract(FocusedActor);
+	
+}
+
+
+void USInteractionActorComponent::ServerInteract_Implementation(AActor* InFocus)
+{
+	if (InFocus == nullptr) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No Focus Actor to interact.");
 		return;
 	}
 	APawn* MyPawn = Cast<APawn>(GetOwner());
 	//is ok if null ptr 
 
-	
-		ISGameplayInterface::Execute_Interact(FocusedActor, MyPawn);
-	
+
+	ISGameplayInterface::Execute_Interact(InFocus, MyPawn);
+
 }

@@ -17,10 +17,9 @@ public:
 	float TargetPitch;
 
 	void Interact_Implementation(APawn* InstigatorPawn);
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
-
-	
-public:	
 	// Sets default values for this actor's properties
 	ASItemChest();
 
@@ -33,8 +32,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(ReplicatedUsing=OnRep_LidOpened, BlueprintReadonly)        //RepNotify
+	bool bLidOpened;
+
+	UFUNCTION()
+	void OnRep_LidOpened();
 
 };

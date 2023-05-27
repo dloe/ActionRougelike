@@ -23,6 +23,8 @@ ASPickupBase::ASPickupBase()
 	//HealthIncrease
 	Triggered = false;
 	TriggerDelay = 10;
+
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned

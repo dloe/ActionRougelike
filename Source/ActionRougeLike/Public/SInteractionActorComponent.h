@@ -24,6 +24,10 @@ public:
 
 protected:
 
+	//multiplayer
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(AActor* InFocus);
+
 	void FindBestInteractable();
 
 	// Called when the game starts

@@ -60,11 +60,11 @@ void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	PState = Cast<ASPlayerState>(PC->PlayerState);
+	//APlayerController* PC = Cast<APlayerController>(GetController());
+	//PState = Cast<ASPlayerState>(PC->PlayerState);
 	//debug print out our credit amount
 	//int Credits = PState->GetCredits();
-	UE_LOG(LogTemp, Log, TEXT("Player Credits on Start: %d"), PState->GetCredits());
+	//UE_LOG(LogTemp, Log, TEXT("Player Credits on Start: %d"), PState->GetCredits());
 }
 
 // Called every frame
