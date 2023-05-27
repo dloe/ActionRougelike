@@ -29,15 +29,26 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Attributes", meta = (DisplayName = "IsAlive"))
 	static bool IsActorAlive(AActor* Actor);
 
+
+
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float Health;
 
 	//other examples
 	//HealthMax, stamina, strength
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float HealthMax = 100;
+
+	//UFUNCTION(ReplicatedUsing="")
+	//bool bIsAlive;
+
+	UFUNCTION(NetMulticast, Reliable) //@FIXME: mark as unreliable once we move the 'state' out of sCharacter
+	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
+
+
+
 
 public:
 

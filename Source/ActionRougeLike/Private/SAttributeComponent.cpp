@@ -3,6 +3,7 @@
 
 #include "SAttributeComponent.h"
 #include "Math/UnrealMathUtility.h"
+#include "Net/UnrealNetwork.h"
 #include <ActionRougeLike/Public/SGameModeBase.h>
 
 
@@ -18,7 +19,11 @@ USAttributeComponent::USAttributeComponent()
 	//UE_LOG(LogTemp, Log, TEXT("Starting Health: %f"), Health);
 	//UE_LOG(LogTemp, Log, TEXT("Max Health: %f"), HealthMax);
 	OnHealthChanged.Broadcast(NULL, this, Health, 0);
+
+	SetIsReplicatedByDefault(true);
 }
+
+
 
 bool USAttributeComponent::Kill(AActor* InstigatorActor)
 {
@@ -52,7 +57,12 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
 	float HealthDelta = Health - OldHealth;
-	OnHealthChanged.Broadcast(Instigator, this, Health, HealthDelta);
+	//OnHealthChanged.Broadcast(Instigator, this, Health, HealthDelta);
+
+	if (HealthDelta != 0.0f)
+	{
+		MulticastHealthChanged(Instigator, Health, HealthDelta);
+	}
 
 	//died
 	if (HealthDelta < 0.0f && Health == 0.0f)
@@ -107,4 +117,19 @@ bool USAttributeComponent::IsActorAlive(AActor* Actor)
 	}
 	//if we dont have an attribute assume we are dead
 	return false;
+}
+
+void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USAttributeComponent, Health);
+	DOREPLIFETIME(USAttributeComponent, HealthMax);
+	//DOREPLIFETIME_CONDITION(USAttributeComponent, HealthMax, COND_InitialOnly);
+}
+
+void USAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
+{
+	OnHealthChanged.Broadcast(InstigatorActor, this, NewHealth, Delta);
+
 }

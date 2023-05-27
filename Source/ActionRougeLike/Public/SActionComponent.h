@@ -38,6 +38,8 @@ public:
 	void RemoveAction(USAction* ActionToRemove);
 
 protected:
+	UFUNCTION(Server, Reliable)
+	void ServerStartAction(AActor* Instigator, FName ActionName);
 
 	//granted abilities at game start
 	UPROPERTY(EditAnywhere, Category = "Actions")
