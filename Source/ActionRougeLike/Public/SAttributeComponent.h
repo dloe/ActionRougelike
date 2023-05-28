@@ -8,7 +8,7 @@
 
 class USAttributeComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewHealth, float, Delta);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnRageChanged, USAttributeComponent*, OwningComp, float, NewRage, float, Delta);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnCreditChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewCredits, float, Delta);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -33,6 +33,7 @@ public:
 
 protected:
 
+	//health attribute
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float Health;
 
@@ -48,10 +49,16 @@ protected:
 	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
 
 
-
+	//Rage attribute
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "Attributes")
+	float Rage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Attributes")
+	float RageMax = 100;
 
 public:
 
+
+	
 	UFUNCTION(BlueprintCallable)
 	bool Kill(AActor* InstigatorActor);
 
@@ -64,9 +71,18 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnCreditChanged OnCreditChanged;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnRageChanged OnRageChanged;
+
 	//return if the change succeeded
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(AActor* Instigator, float Delta);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	void ApplyRageChange(AActor* Instigator, float Delta);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool SpendRage(AActor* Instigator, float CostDelta);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsUnderMaxHealth() const;

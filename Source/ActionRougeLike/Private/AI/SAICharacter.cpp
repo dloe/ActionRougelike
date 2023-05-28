@@ -40,6 +40,7 @@ void ASAICharacter::PostInitializeComponents()
 
     //Add dynamic is known for not being found through unreal magic (AKA INTELLISENSE), its ok that it doesnt see it here
     AttributeComponent->OnHealthChanged.AddDynamic(this, &ASAICharacter::OnHealthChanged);
+    //AttributeComponent->OnRageChanged.AddDynamic(this, &ASAICharacter::OnRageChanged);
 }
 
 void ASAICharacter::OnPawnSeen(APawn* Pawn)

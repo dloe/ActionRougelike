@@ -16,9 +16,11 @@ USAttributeComponent::USAttributeComponent()
 	
 	// set to max health on start
 	Health = HealthMax;
+	Rage = 0;
 	//UE_LOG(LogTemp, Log, TEXT("Starting Health: %f"), Health);
 	//UE_LOG(LogTemp, Log, TEXT("Max Health: %f"), HealthMax);
 	OnHealthChanged.Broadcast(NULL, this, Health, 0);
+	OnRageChanged.Broadcast(this, Rage, 0);
 
 	SetIsReplicatedByDefault(true);
 }
@@ -51,13 +53,16 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 	}
 
 	float OldHealth = Health;
-
-	//Health += Delta;
-	//UE_LOG(LogTemp, Log, TEXT("Health: %f"), Health);
+	UE_LOG(LogTemp, Log, TEXT("before Health: %f"), Health);
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
-
+	UE_LOG(LogTemp, Log, TEXT("Health: %f"), Health);
 	float HealthDelta = Health - OldHealth;
 	//OnHealthChanged.Broadcast(Instigator, this, Health, HealthDelta);
+	
+	UE_LOG(LogTemp, Log, TEXT("True Delta: %d"), FMath::Abs(Delta));
+	//could add a rage multiplier
+	ApplyRageChange(Instigator, FMath::Abs(Delta));
+
 
 	if (HealthDelta != 0.0f)
 	{
@@ -81,6 +86,27 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 
 	//make sure we know if this even applied a health change
 	return HealthDelta != 0;
+}
+
+void USAttributeComponent::ApplyRageChange(AActor* Instigator, float Delta)
+{
+	UE_LOG(LogTemp, Log, TEXT("BEFORE Range Delta: %d"), Rage);
+	//add rage when we take damage
+	Rage = FMath::Clamp(Rage + Delta, 0.0f, RageMax);
+	UE_LOG(LogTemp, Log, TEXT("AFTER Range Delta: %d"), Rage);
+	//Update Rage UI 
+	OnRageChanged.Broadcast(this, Rage, Delta);
+
+}
+
+bool USAttributeComponent::SpendRage(AActor* Instigator, float CostDelta)
+{
+	if (Rage > CostDelta)
+	{
+		ApplyRageChange(Instigator, -CostDelta);
+		return true;
+	} 
+	return false;
 }
 
 bool USAttributeComponent::IsUnderMaxHealth() const
@@ -132,4 +158,5 @@ void USAttributeComponent::MulticastHealthChanged_Implementation(AActor* Instiga
 {
 	OnHealthChanged.Broadcast(InstigatorActor, this, NewHealth, Delta);
 
+	
 }

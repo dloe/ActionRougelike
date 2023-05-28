@@ -40,7 +40,7 @@ ASCharacter::ASCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
 	
-
+	BlackHoleRageCost = 25;
 	bUseControllerRotationYaw = false;
 
 	TimeToHitParameterName = "TimeToHit";
@@ -180,7 +180,14 @@ void ASCharacter::PrimaryInteract()
 //blackhole assignment 2
 void ASCharacter::BlackholeAttack()
 {
-	ActionComp->StartActionByName(this, "Blackhole");
+	//check if we have rage to trigger
+	if (AttributeComponent->SpendRage(this, BlackHoleRageCost)) {
+		ActionComp->StartActionByName(this, "Blackhole");
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Not enough Rage!"));
+	}
 
 }
 

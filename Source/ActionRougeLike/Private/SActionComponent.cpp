@@ -71,6 +71,8 @@ bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 				continue;
 			}
 
+			//blackholes cost rage
+
 			//to avoid an infi loop
 			if (!GetOwner()->HasAuthority()) {
 				ServerStartAction(Instigator, ActionName);

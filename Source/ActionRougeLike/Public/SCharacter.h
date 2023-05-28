@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	int HitFlashSpeed;
 
+	UPROPERTY(EditDefaultsOnly)
+	int BlackHoleRageCost;
+
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParameterName;
 
