@@ -38,7 +38,7 @@ void ASAICharacter::PostInitializeComponents()
 
     PawnSensingComp->OnSeePawn.AddDynamic(this, &ASAICharacter::OnPawnSeen);
 
-    //Add dynamic is known for not being found through unreal magic (AKA INTELLISENSE), its ok that it doesnt see it here
+    //Add dynamic bind is known for not being found through unreal magic (AKA INTELLISENSE), its ok that it doesnt see it here
     AttributeComponent->OnHealthChanged.AddDynamic(this, &ASAICharacter::OnHealthChanged);
     //AttributeComponent->OnRageChanged.AddDynamic(this, &ASAICharacter::OnRageChanged);
 }

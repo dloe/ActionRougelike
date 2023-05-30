@@ -5,6 +5,8 @@
 #include "Math/UnrealMathUtility.h"
 #include "Net/UnrealNetwork.h"
 #include <ActionRougeLike/Public/SGameModeBase.h>
+#include "SActionEffect.h"
+#include <SActionComponent.h>
 
 
 static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("su.DamageMultiplier"), 1.0f, TEXT("Global Damage Multiplier for Attribute Component."), ECVF_Cheat);
@@ -53,15 +55,17 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 	}
 
 	float OldHealth = Health;
-	UE_LOG(LogTemp, Log, TEXT("before Health: %f"), Health);
+	//UE_LOG(LogTemp, Log, TEXT("before Health: %f"), Health);
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
-	UE_LOG(LogTemp, Log, TEXT("Health: %f"), Health);
-	float HealthDelta = Health - OldHealth;
+	//UE_LOG(LogTemp, Log, TEXT("after Health: %f"), Health);
+	float HealthDelta = Health - OldHealth; 
 	//OnHealthChanged.Broadcast(Instigator, this, Health, HealthDelta);
 	
-	UE_LOG(LogTemp, Log, TEXT("True Delta: %d"), FMath::Abs(Delta));
+	//UE_LOG(LogTemp, Log, TEXT("True Delta: %d"), FMath::Abs(Delta));
 	//could add a rage multiplier
 	ApplyRageChange(Instigator, FMath::Abs(Delta));
+
+	
 
 
 	if (HealthDelta != 0.0f)
@@ -90,10 +94,10 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 
 void USAttributeComponent::ApplyRageChange(AActor* Instigator, float Delta)
 {
-	UE_LOG(LogTemp, Log, TEXT("BEFORE Range Delta: %d"), Rage);
+	//UE_LOG(LogTemp, Log, TEXT("BEFORE Range Delta: %d"), Rage);
 	//add rage when we take damage
 	Rage = FMath::Clamp(Rage + Delta, 0.0f, RageMax);
-	UE_LOG(LogTemp, Log, TEXT("AFTER Range Delta: %d"), Rage);
+	//UE_LOG(LogTemp, Log, TEXT("AFTER Range Delta: %d"), Rage);
 	//Update Rage UI 
 	OnRageChanged.Broadcast(this, Rage, Delta);
 

@@ -9,6 +9,7 @@
 #include <SActionComponent.h>
 #include "Particles/ParticleSystemComponent.h"
 #include "SPlayerState.h"
+#include "SActionEffect.h"
 #include "SCharacter.generated.h"
 
 
@@ -61,6 +62,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	FColor HitFlashColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<USActionEffect> ThornActionClass;
 
 	//actions
 	void SprintStart();

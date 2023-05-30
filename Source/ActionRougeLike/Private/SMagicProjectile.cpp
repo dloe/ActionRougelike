@@ -33,9 +33,6 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 	if(OtherActor && OtherActor != GetInstigator())
 	{
 		//static FGameplayTag Tag = FGameplayTag::RequestGameplayTag("Status.Parrying");
-
-
-
 		//UE_LOG(LogTemp, Log, TEXT("OnActorOverlap in projectile"));
 
 		USActionComponent* ActionComp = Cast<USActionComponent>(OtherActor->GetComponentByClass(USActionComponent::StaticClass()));

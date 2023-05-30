@@ -53,6 +53,7 @@ void ASCharacter::PostInitializeComponents()
 	//Add dynamic is known for not being found through unreal magic (AKA INTELLISENSE), its ok that it doesnt see it here
 	AttributeComponent->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 
+	
 }
 
 // Called when the game starts or when spawned
@@ -65,6 +66,15 @@ void ASCharacter::BeginPlay()
 	//debug print out our credit amount
 	//int Credits = PState->GetCredits();
 	//UE_LOG(LogTemp, Log, TEXT("Player Credits on Start: %d"), PState->GetCredits());
+
+	//test thorns 
+	//if (ensure(ActionComp))
+	//{
+		//ActionComp->AddAction(this, ThornActionClass);
+		//set damage here?
+		//ThornActionClass->
+		//UE_LOG(LogTemp, Log, TEXT("check"));
+	//}
 }
 
 // Called every frame
@@ -158,6 +168,18 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 			SkeletalMesh->SetVectorParameterValueOnMaterials("HitFlashColor", ColortoVector);
 			
 			SkeletalMesh->SetScalarParameterValueOnMaterials("HitFlashSpeed", HitFlashSpeed);
+
+
+			//Thorns buff here
+			//thorns run here - will need to move to StartAction
+			if (ensure(ActionComp))
+			{
+				
+				//set damage here?
+				//ThornActionClass->
+				UE_LOG(LogTemp, Log, TEXT("check"));
+			}
+
 
 	}
 }

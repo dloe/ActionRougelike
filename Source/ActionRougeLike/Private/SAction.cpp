@@ -13,6 +13,9 @@ void USAction::StartAction_Implementation(AActor* Instigator)
 	Comp->ActiveGameplayTags.AppendTags(GrantsTags);
 
 	bIsRunning = true;
+
+	
+
 }
 
 void USAction::StopAction_Implementation(AActor* Instigator)

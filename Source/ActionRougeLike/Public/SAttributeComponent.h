@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "SActionEffect.h"
 #include "SAttributeComponent.generated.h"
 
 class USAttributeComponent;
@@ -32,6 +33,8 @@ public:
 
 
 protected:
+
+	
 
 	//health attribute
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
