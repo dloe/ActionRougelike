@@ -5,7 +5,7 @@
 
 void USAction::StartAction_Implementation(AActor* Instigator)
 {
-	UE_LOG(LogTemp, Log, TEXT("Running: %s"), *GetNameSafe(this));
+	//UE_LOG(LogTemp, Log, TEXT("Running: %s"), *GetNameSafe(this));
 
 	USActionComponent* Comp = GetOwningComponent();
 
@@ -20,7 +20,7 @@ void USAction::StartAction_Implementation(AActor* Instigator)
 
 void USAction::StopAction_Implementation(AActor* Instigator)
 {
-	UE_LOG(LogTemp, Log, TEXT("Stopping: %s"), *GetNameSafe(this));
+	//UE_LOG(LogTemp, Log, TEXT("Stopping: %s"), *GetNameSafe(this));
 
 	//check if boolean even on as santity
 	ensureAlways(bIsRunning);

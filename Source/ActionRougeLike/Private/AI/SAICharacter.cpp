@@ -45,11 +45,27 @@ void ASAICharacter::PostInitializeComponents()
 
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
-    SetTargetActor(Pawn);
-    //add a draw debug string at the location of the actor so that we have something that shows where the player was spotted
-    DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted", nullptr, FColor::White, 4.0f, true);
-    
+    // Ignore if target already set
+    if (GetTargetActor() != Pawn)
+    {
+        SetTargetActor(Pawn);
+        //add a draw debug string at the location of the actor so that we have something that shows where the player was spotted
+        //DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted", nullptr, FColor::White, 4.0f, true);
 
+        EnemySpottedWidget = CreateWidget<USWorldUserWidget>(GetWorld(), EnemySpottedWidgetClass);
+        if (EnemySpottedWidget) {
+            EnemySpottedWidget->AttachedActor = this;
+            EnemySpottedWidget->AddToViewport(10);
+            DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted WIDGET", nullptr, FColor::White, 4.0f, true);
+            UE_LOG(LogTemp, Log, TEXT("PlayerSpotted WIDGET"));
+        }
+        else {
+            DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted NO WIDGET", nullptr, FColor::Red, 4.0f, true);
+            UE_LOG(LogTemp, Log, TEXT("PlayerSpotted NOOO WIDGET"));
+        }
+
+        MulticastPawnSeen();
+    }
 }
 
 void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
@@ -116,9 +132,6 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
             }
         }
     }
-
-
-    
 }
 
 void ASAICharacter::SetTargetActor(AActor* NewTarget)
@@ -129,8 +142,29 @@ void ASAICharacter::SetTargetActor(AActor* NewTarget)
         //dont even need to null check this since we know for a fact this is valid. Cannot be null
         AIC->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
     }
-
 }
 
+AActor* ASAICharacter::GetTargetActor() const
+{
+    AAIController* AIC = Cast<AAIController>(GetController());
+    if (AIC)
+    {
+        return Cast<AActor>(AIC->GetBlackboardComponent()->GetValueAsObject("TargetActor"));
+        //return AIC->GetBlackboardComponent()->GetValueAsObject("TargetActor");
+    }
 
+    return nullptr;
+}
+
+void ASAICharacter::MulticastPawnSeen_Implementation()
+{
+    USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(), EnemySpottedWidgetClass);
+    if (NewWidget)
+    {
+        NewWidget->AttachedActor = this;
+        // Index of 10 (or anything higher than default of 0) places this on top of any other widget.
+        // May end up behind the minion health bar otherwise.
+        NewWidget->AddToViewport(10);
+    }
+}
 

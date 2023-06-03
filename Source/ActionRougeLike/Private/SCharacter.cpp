@@ -172,13 +172,13 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 
 			//Thorns buff here
 			//thorns run here - will need to move to StartAction
-			if (ensure(ActionComp))
-			{
+			//if (ensure(ActionComp))
+			//{
 				
 				//set damage here?
 				//ThornActionClass->
-				UE_LOG(LogTemp, Log, TEXT("check"));
-			}
+				//UE_LOG(LogTemp, Log, TEXT("check"));
+			//}
 
 
 	}

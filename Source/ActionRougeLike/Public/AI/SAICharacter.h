@@ -29,11 +29,14 @@ public:
 
 protected:
 	
-
 	USWorldUserWidget* ActiveHealthBar;
+	USWorldUserWidget* EnemySpottedWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> EnemySpottedWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
@@ -54,10 +57,14 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
-
+	UFUNCTION(BlueprintCallable, Category = "AI")
+		AActor* GetTargetActor() const;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPawnSeen();
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);

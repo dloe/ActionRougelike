@@ -6,7 +6,7 @@
 
 bool USGameplayFunctionLibrary::ApplyDamage(AActor* DamageCauser, AActor* TargetActor, float DamageAmount)
 {
-	UE_LOG(LogTemp, Log, TEXT("In apply damage: %f on %d"), DamageAmount, *GetNameSafe(TargetActor));
+	//UE_LOG(LogTemp, Log, TEXT("In apply damage: %f on %d"), DamageAmount, *GetNameSafe(TargetActor));
 	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(TargetActor);
 	if (AttributeComp)
 	{
