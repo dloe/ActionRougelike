@@ -223,7 +223,10 @@ void ASCharacter::TeleportAbility()
 //
 //
 //	GetWorldTimerManager().SetTimer(TimerHandle_TeleportAttack, this, &ASCharacter::TeleportAbility_TimeElasped, 0.2f);
-	ActionComp->StartActionByName(this, "Dash");
+	if (ActionComp->CheckActionName("Dash"))
+	{
+		ActionComp->StartActionByName(this, "Dash");
+	}
 }
 
 //cheat

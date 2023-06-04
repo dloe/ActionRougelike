@@ -33,7 +33,6 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMessage);
 }
 
-
 void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass)
 {
 	if (!ensure(ActionClass))
@@ -53,7 +52,6 @@ void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> Acti
 		if (NewAction->bAutoStart && ensure(NewAction->CanStart(Instigator)))
 			NewAction->StartAction(Instigator);
 	}
-
 }
 
 bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
@@ -108,6 +106,24 @@ void USActionComponent::RemoveAction(USAction* ActionToRemove)
 		return;
 	}
 	Actions.Remove(ActionToRemove);
+}
+
+bool USActionComponent::CheckAction(TSubclassOf<USAction> ActionClass)
+{
+	return DefaultActions.Contains(ActionClass);
+}
+
+bool USActionComponent::CheckActionName(FName ActionName)
+{
+	for (USAction* Action : Actions)
+	{
+		if (Action && Action->ActionName == ActionName)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void USActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
