@@ -203,6 +203,7 @@ void ASCharacter::PrimaryInteract()
 void ASCharacter::BlackholeAttack()
 {
 	//check if we have rage to trigger
+	//COULD ALSO DO THIS IN BP for Action_Blackhole
 	if (AttributeComponent->SpendRage(this, BlackHoleRageCost)) {
 		ActionComp->StartActionByName(this, "Blackhole");
 	}
@@ -223,6 +224,7 @@ void ASCharacter::TeleportAbility()
 //
 //
 //	GetWorldTimerManager().SetTimer(TimerHandle_TeleportAttack, this, &ASCharacter::TeleportAbility_TimeElasped, 0.2f);
+	//COULD ALSO DO THIS IN BP
 	if (ActionComp->CheckActionName("Dash"))
 	{
 		ActionComp->StartActionByName(this, "Dash");

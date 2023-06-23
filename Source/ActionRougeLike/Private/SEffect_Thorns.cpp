@@ -41,9 +41,16 @@ void USEffect_Thorns::StopAction_Implementation(AActor* Instigator)
 void USEffect_Thorns::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
 	//UE_LOG(LogTemp, Log, TEXT("Onhealthchanged called in thorns"));
-	if (InstigatorActor != OwningComp->GetOwner()) {
+	if (Delta < 0.0f && InstigatorActor != OwningComp->GetOwner()) {
 		//apply percentage damage
-		USGameplayFunctionLibrary::ApplyDamage(OwningComp->GetOwner(), InstigatorActor, FMath::Abs(FMath::CeilToInt(Delta * ThornReflect)));
+		int32 ReflectedAmount = FMath::RoundToInt(Delta * ThornReflect); //FMath::Abs(FMath::CeilToInt(Delta * ThornReflect));
+
+		if (ReflectedAmount == 0)
+		{
+			return;
+		}
+		ReflectedAmount = FMath::Abs(ReflectedAmount);
+		USGameplayFunctionLibrary::ApplyDamage(OwningComp->GetOwner(), InstigatorActor, ReflectedAmount);
 		//UE_LOG(LogTemp, Log, TEXT("Applied Thorn Damage %f"), FMath::CeilToInt( Delta * ThornReflect));
 	}
 }

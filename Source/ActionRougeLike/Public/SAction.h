@@ -16,6 +16,8 @@ class ACTIONROUGELIKE_API USAction : public UObject
 	GENERATED_BODY()
 	
 protected:
+	UPROPERTY(Replicated)
+	USActionComponent* ActionComp;
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	USActionComponent* GetOwningComponent() const;
@@ -29,9 +31,15 @@ protected:
 	FGameplayTagContainer BlockedTags;
 
 	//check to make sure if the action is actually running (to avoid things like stopping something that never ran in the first place)
+	UPROPERTY(ReplicatedUsing = "OnRep_IsRunning")
 	bool bIsRunning;
 
+	UFUNCTION()
+	void OnRep_IsRunning();
+
 public:
+
+	void Initialize(USActionComponent* NewActionComponent);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	bool bAutoStart;
@@ -54,4 +62,9 @@ public:
 		
 	UWorld* GetWorld() const override;
 
+	//no need for it in cpp will update this in header file
+	bool IsSupportedForNetworking() const override
+	{
+		return true;
+	}
 };

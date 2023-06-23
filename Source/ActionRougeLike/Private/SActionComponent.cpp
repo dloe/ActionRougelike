@@ -1,6 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "SActionComponent.h"
 #include "SAction.h"
+#include <ActionRougeLike/ActionRougeLike.h>
+#include "Engine/ActorChannel.h"
+#include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 
 
 // Sets default values for this component's properties
@@ -16,10 +19,17 @@ void USActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (TSubclassOf<USAction> ActionClass : DefaultActions)
+
+	//make sure this only runs on server (server only)
+	if (GetOwner()->HasAuthority())
 	{
-		AddAction(GetOwner(),ActionClass);
+		for (TSubclassOf<USAction> ActionClass : DefaultActions)
+		{
+			AddAction(GetOwner(), ActionClass);
+		}
 	}
+
+
 }
 
 // Called every frame
@@ -29,9 +39,23 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 	//debug for helping illustrate tags
 	//to string simple has less markup and more efficient
-	FString DebugMessage = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMessage);
+	//FString DebugMessage = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMessage);
+
+	//draw all actions
+	for (USAction* Action : Actions)
+	{
+		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
+		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s : IsRunning: %s : Outer: %s"),
+			*GetNameSafe(GetOwner()),
+			*Action->ActionName.ToString(),
+			Action->IsRunning() ? TEXT("True") : TEXT("False"),
+			*GetNameSafe(Action->GetOuter()));
+		LogOnScreen(this, ActionMsg, TextColor, 0.0f);
+	}
 }
+
+
 
 void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass)
 {
@@ -43,10 +67,11 @@ void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> Acti
 	//instantiate an object
 	//outer, whoever owns this object in a way, pass in this because the action component will own this
 	//next is action class
-	USAction* NewAction = NewObject<USAction>(this, ActionClass);
+	USAction* NewAction = NewObject<USAction>(GetOwner(), ActionClass);
 	//add the action to our array
 	if (ensure(NewAction))
 	{
+		NewAction->Initialize(this);
 		Actions.Add(NewAction);
 
 		if (NewAction->bAutoStart && ensure(NewAction->CanStart(Instigator)))
@@ -111,6 +136,15 @@ void USActionComponent::RemoveAction(USAction* ActionToRemove)
 bool USActionComponent::CheckAction(TSubclassOf<USAction> ActionClass)
 {
 	return DefaultActions.Contains(ActionClass);
+	//or
+	//for (USAction* Action : Actions)
+	//{
+		//if (Action && Action->IsA(ActionClass))
+		//{
+			//return ActionClass;
+		//}
+	//}
+	//return nullptr;
 }
 
 bool USActionComponent::CheckActionName(FName ActionName)
@@ -130,4 +164,30 @@ void USActionComponent::ServerStartAction_Implementation(AActor* Instigator, FNa
 {
 	StartActionByName(Instigator, ActionName);
 
+}
+
+//we shouldnt need to add the header file since we marked a var as replciated. Its only generated h should include it
+void  USActionComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USActionComponent, Actions);
+}
+
+
+bool USActionComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+{
+	bool WroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+	for (USAction* Action : Actions)
+	{
+		if (Action)
+		{
+			//using bitwise to write to WroteSomthing
+			//make sure that it keeps track of wheather or not it wrote somehting
+			WroteSomething |= Channel->ReplicateSubobject(Action, *Bunch, *RepFlags);
+
+		}
+	}
+
+	return WroteSomething;
 }

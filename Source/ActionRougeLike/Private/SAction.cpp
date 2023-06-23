@@ -1,11 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "SAction.h"
 #include "SActionComponent.h"
+#include <ActionRougeLike/ActionRougeLike.h>
+#include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 
+void USAction::Initialize(USActionComponent* NewActionComp)
+{
+	ActionComp = NewActionComp;
+
+}
 
 void USAction::StartAction_Implementation(AActor* Instigator)
 {
 	//UE_LOG(LogTemp, Log, TEXT("Running: %s"), *GetNameSafe(this));
+	LogOnScreen(this, FString::Printf(TEXT("Started: %s"), *ActionName.ToString()), FColor::Green);
 
 	USActionComponent* Comp = GetOwningComponent();
 
@@ -21,9 +29,11 @@ void USAction::StartAction_Implementation(AActor* Instigator)
 void USAction::StopAction_Implementation(AActor* Instigator)
 {
 	//UE_LOG(LogTemp, Log, TEXT("Stopping: %s"), *GetNameSafe(this));
+	LogOnScreen(this, FString::Printf(TEXT("Stopped: %s"), *ActionName.ToString()), FColor::White);
 
 	//check if boolean even on as santity
-	ensureAlways(bIsRunning);
+	//this will have issues when running on client and server so we will remove it 
+	//ensureAlways(bIsRunning);
 
 	USActionComponent* Comp = GetOwningComponent();
 
@@ -56,10 +66,10 @@ bool USAction::CanStart_Implementation(AActor* Instigator)
 UWorld* USAction::GetWorld() const
 {
 	//this outer is set when creating action via newobject<>
-	UActorComponent* Comp = Cast<UActorComponent>(GetOuter());
-	if (Comp)
+	AActor* Actor = Cast<AActor>(GetOuter());
+	if (Actor)
 	{
-		return Comp->GetWorld();
+		return Actor->GetWorld();
 	}
 	return nullptr;
 }
@@ -67,11 +77,43 @@ UWorld* USAction::GetWorld() const
 
 USActionComponent* USAction::GetOwningComponent() const
 {
-	return Cast<USActionComponent>(GetOuter());
+	//not optimal way
+	//AActor* Actor = Cast<AActor>(GetOuter());
+	//we end up calling this alot and having to iteration though an entire list of components is inefficient,
+	//lets go with other way (making a new function Initialize)
+	//return Actor->GetComponentByClass(USActionComponent::StaticClass());
+
+
+	//gotta fix this to work with replciation
+	//can fix in 2 ways
+	//return Cast<USActionComponent>(GetOuter());
+
+	return ActionComp;
 }
 
+
+void USAction::OnRep_IsRunning()
+{
+	if (bIsRunning)
+	{
+		//TO DO: Fix Instigator
+		StartAction(nullptr);
+	}
+	else {
+		StopAction(nullptr);
+	}
+
+}
 
 bool USAction::IsRunning() const
 {
 	return bIsRunning;
+}
+
+void USAction::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USAction, bIsRunning);
+	DOREPLIFETIME(USAction, ActionComp);
 }
