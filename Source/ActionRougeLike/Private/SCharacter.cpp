@@ -146,17 +146,7 @@ void ASCharacter::MoveRight(float value)
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
-	
-	if (NewHealth <= 0.0f && Delta < 0.0f)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Player Death!"));
-		APlayerController* PC = Cast<APlayerController>(GetController());
-		DisableInput(PC);
-		
-
-		
-	}
-	else if (Delta < 0.0f)                                                //Player took damange but not dead
+	if (Delta < 0.0f)                                                //Player took damange
 	{
 		//UE_LOG(LogTemp, Log, TEXT("On Health changed!"));
 		//change material
@@ -179,7 +169,15 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 				//ThornActionClass->
 				//UE_LOG(LogTemp, Log, TEXT("check"));
 			//}
+	}
 
+	if (NewHealth <= 0.0f && Delta < 0.0f)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Player Death!"));
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+
+		SetLifeSpan(8.0f);
 
 	}
 }

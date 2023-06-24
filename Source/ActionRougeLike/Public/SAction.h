@@ -10,6 +10,20 @@
 
 class UWorld;
 
+USTRUCT()
+struct FActionRepData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	bool bIsRunning;
+
+	//NotReplicated could use but dont
+	UPROPERTY()
+	AActor* Instigator;
+};
+
 UCLASS(Blueprintable)
 class ACTIONROUGELIKE_API USAction : public UObject
 {
@@ -31,11 +45,12 @@ protected:
 	FGameplayTagContainer BlockedTags;
 
 	//check to make sure if the action is actually running (to avoid things like stopping something that never ran in the first place)
-	UPROPERTY(ReplicatedUsing = "OnRep_IsRunning")
-	bool bIsRunning;
+	UPROPERTY(ReplicatedUsing = "OnRep_RepData")
+	FActionRepData RepData;
+	//bool bIsRunning;
 
 	UFUNCTION()
-	void OnRep_IsRunning();
+	void OnRep_RepData();
 
 public:
 

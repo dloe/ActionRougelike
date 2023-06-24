@@ -12,24 +12,24 @@ void USAction::Initialize(USActionComponent* NewActionComp)
 
 void USAction::StartAction_Implementation(AActor* Instigator)
 {
-	//UE_LOG(LogTemp, Log, TEXT("Running: %s"), *GetNameSafe(this));
-	LogOnScreen(this, FString::Printf(TEXT("Started: %s"), *ActionName.ToString()), FColor::Green);
+	UE_LOG(LogTemp, Log, TEXT("Running: %s"), *GetNameSafe(this));
+	//LogOnScreen(this, FString::Printf(TEXT("Started: %s"), *ActionName.ToString()), FColor::Green);
 
 	USActionComponent* Comp = GetOwningComponent();
 
 	//add them all
 	Comp->ActiveGameplayTags.AppendTags(GrantsTags);
 
-	bIsRunning = true;
-
+	RepData.bIsRunning = true;
+	RepData.Instigator = Instigator;
 	
 
 }
 
 void USAction::StopAction_Implementation(AActor* Instigator)
 {
-	//UE_LOG(LogTemp, Log, TEXT("Stopping: %s"), *GetNameSafe(this));
-	LogOnScreen(this, FString::Printf(TEXT("Stopped: %s"), *ActionName.ToString()), FColor::White);
+	UE_LOG(LogTemp, Log, TEXT("Stopping: %s"), *GetNameSafe(this));
+	//LogOnScreen(this, FString::Printf(TEXT("Stopped: %s"), *ActionName.ToString()), FColor::White);
 
 	//check if boolean even on as santity
 	//this will have issues when running on client and server so we will remove it 
@@ -40,7 +40,9 @@ void USAction::StopAction_Implementation(AActor* Instigator)
 	//remove them all
 	Comp->ActiveGameplayTags.RemoveTags(GrantsTags);
 
-	bIsRunning = false;
+	RepData.bIsRunning = false;
+	RepData.Instigator = Instigator;
+
 }
 
 bool USAction::CanStart_Implementation(AActor* Instigator)
@@ -92,28 +94,28 @@ USActionComponent* USAction::GetOwningComponent() const
 }
 
 
-void USAction::OnRep_IsRunning()
+void USAction::OnRep_RepData()
 {
-	if (bIsRunning)
+	if (RepData.bIsRunning)
 	{
 		//TO DO: Fix Instigator
-		StartAction(nullptr);
+		StartAction(RepData.Instigator);
 	}
 	else {
-		StopAction(nullptr);
+		StopAction(RepData.Instigator);
 	}
 
 }
 
 bool USAction::IsRunning() const
 {
-	return bIsRunning;
+	return RepData.bIsRunning;
 }
 
 void USAction::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(USAction, bIsRunning);
+	DOREPLIFETIME(USAction, RepData);
 	DOREPLIFETIME(USAction, ActionComp);
 }

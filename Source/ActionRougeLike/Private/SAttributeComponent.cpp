@@ -43,6 +43,16 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 	if (!GetOwner()->CanBeDamaged() && Delta < 0.0f)
 		return false;
 
+
+
+	//replication bug
+	//if (!GetOwner()->HasAuthority())
+	//{
+		//return false;
+	//}
+
+
+
 	//this does it to EVERYTHING, including player, enemies, explosives, etc
 	//potentially could have mutliple versions to tweak more granularly
 	if (Delta < 0.0f)
@@ -53,35 +63,36 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 	}
 
 	float OldHealth = Health;
+	float NewHealth = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 	//UE_LOG(LogTemp, Log, TEXT("before Health: %f"), Health);
-	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
+
 	//UE_LOG(LogTemp, Log, TEXT("after Health: %f"), Health);
-	float HealthDelta = Health - OldHealth; 
+	float HealthDelta = NewHealth - OldHealth;
 	//OnHealthChanged.Broadcast(Instigator, this, Health, HealthDelta);
-	
-	//UE_LOG(LogTemp, Log, TEXT("True Delta: %d"), FMath::Abs(Delta));
-	//could add a rage multiplier
-	ApplyRageChange(Instigator, FMath::Abs(Delta));
 
-	
-
-
-	if (HealthDelta != 0.0f)
+	if (GetOwner()->HasAuthority())
 	{
-		MulticastHealthChanged(Instigator, Health, HealthDelta);
-	}
+		Health = NewHealth;
 
-	//died
-	if (HealthDelta < 0.0f && Health == 0.0f)
-	{
-		ASGameModeBase* GM = GetWorld()->GetAuthGameMode<ASGameModeBase>();
-		if (GM)
+		if (HealthDelta != 0.0f)
 		{
-			GM->OnActorKilled(GetOwner(), Instigator);
+			MulticastHealthChanged(Instigator, Health, HealthDelta);
+		}
+
+		//UE_LOG(LogTemp, Log, TEXT("True Delta: %d"), FMath::Abs(Delta));
+//could add a rage multiplier
+		ApplyRageChange(Instigator, FMath::Abs(Delta));
+
+		//died
+		if (HealthDelta < 0.0f && Health == 0.0f)
+		{
+			ASGameModeBase* GM = GetWorld()->GetAuthGameMode<ASGameModeBase>();
+			if (GM)
+			{
+				GM->OnActorKilled(GetOwner(), Instigator);
+			}
 		}
 	}
-
-
 	//UE_LOG(LogTemp, Log, TEXT("New Health: %f"), Health);
 	//OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
 	//for now it will return true, we can add to this later
