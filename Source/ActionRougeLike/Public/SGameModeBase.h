@@ -12,6 +12,7 @@
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
+class USSaveGame;
 
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnCreditChange, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewCredits, float, Delta);
 
@@ -21,6 +22,11 @@ class ACTIONROUGELIKE_API ASGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 protected:
+
+	FString SlotName;
+
+	UPROPERTY()
+	USSaveGame* CurrentSaveGame;
 
 	//ai
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
@@ -82,7 +88,12 @@ public:
 
 	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
 
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
 	virtual void StartPlay() override;
+
+	//UFUNCTION(BlueprintNativeEvent, Category = Game)
+	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
 	UFUNCTION(exec)
 	void KillAll();
@@ -90,4 +101,10 @@ public:
 	//when player kills minion
 	UFUNCTION()
 	void KillMinionEvent(AActor* InstigatorActor, int MinionCost);
+
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void WriteSaveGame();
+
+	void LoadSaveGame();
 };

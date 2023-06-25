@@ -5,17 +5,20 @@
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
+#include "Kismet/GameplayStatics.h"
 #include <ActionRougeLike/Public/AI/SAICharacter.h>
 #include <ActionRougeLike/Public/SAttributeComponent.h>
 #include "EngineUtils.h"
+#include "SSaveGame.h"
+#include "GameFramework/GameState.h"
 #include "GameFramework/PlayerState.h"
 #include <ActionRougeLike/Public/SCharacter.h>
+#include <ActionRougeLike/Public/SGameplayInterface.h>
+#include <Serialization/ObjectAndNameAsStringProxyArchive.h>
 //dont think the eenvqueryrunmode enum is needed to include header
 
 //cvar
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
-
-
 
 ASGameModeBase::ASGameModeBase()
 {
@@ -26,6 +29,14 @@ ASGameModeBase::ASGameModeBase()
 	PlayerStateClass = ASPlayerState::StaticClass();
 }
 
+void ASGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	LoadSaveGame();
+	SlotName = "SaveGame01";
+}
+
 void ASGameModeBase::StartPlay()
 {
 	Super::StartPlay();
@@ -34,6 +45,17 @@ void ASGameModeBase::StartPlay()
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
 
 
+}
+
+void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	ASPlayerState* PS = NewPlayer->GetPlayerState<ASPlayerState>();
+	if (PS)
+	{
+		PS->LoadPlayerState(CurrentSaveGame);
+	}
 }
 
 void ASGameModeBase::SpawnBotTimerElapsed()
@@ -177,7 +199,6 @@ void ASGameModeBase::OnQueryBotSpawnCompleted(UEnvQueryInstanceBlueprintWrapper*
 	}
 }
 
-
 void ASGameModeBase::SpawnPowerups()
 {
 	if (ensure(PowerupClasses.Num() > 0))
@@ -245,6 +266,8 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 	}
 }
 
+
+
 void ASGameModeBase::RespawnPlayerElasped(AController* Controller)
 {
 	if (ensure(Controller))
@@ -257,3 +280,102 @@ void ASGameModeBase::RespawnPlayerElasped(AController* Controller)
 }
 
 
+void ASGameModeBase::WriteSaveGame()
+{
+	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	{
+		ASPlayerState* PS = Cast<ASPlayerState>(GameState->PlayerArray[i]);
+		if (PS)
+		{
+			PS->SavePlayerState(CurrentSaveGame);
+			break; // single player only at this point
+		}
+	}
+
+
+	CurrentSaveGame->SavedActors.Empty();
+
+	//iterate the entire world of actors
+	for (FActorIterator It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		// only interested in our 'gameplay actors'
+		if (!Actor->Implements<USGameplayInterface>())
+		{
+			continue;
+		}
+
+		FActorSaveData ActorData;
+		ActorData.ActorName = Actor->GetName();
+		ActorData.Transform = Actor->GetActorTransform();
+
+		//pass array to fill with data from actor
+		FMemoryWriter MemWriter(ActorData.ByteData);
+
+		FObjectAndNameAsStringProxyArchive Ar(MemWriter, true);
+		//marks it as only looking for those saving props UPROPERTY(SaveGame)
+		Ar.ArIsSaveGame = true;
+		//converts actors SaveGame UPROPERTIES into binrary array
+		Actor->Serialize(Ar);
+
+
+		CurrentSaveGame->SavedActors.Add(ActorData);
+	}
+
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
+}
+
+void ASGameModeBase::LoadSaveGame()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+	{
+		CurrentSaveGame = Cast<USSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+		if (CurrentSaveGame == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame data"));
+			return;
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Loaded SaveGame data"));
+
+		for (FActorIterator It(GetWorld()); It; ++It)
+		{
+			AActor* Actor = *It;
+			// only interested in our 'gameplay actors'
+			if (!Actor->Implements<USGameplayInterface>())
+			{
+				continue;
+			}
+
+			for (FActorSaveData ActorData : CurrentSaveGame->SavedActors)
+			{
+				if (ActorData.ActorName == Actor->GetName())
+				{
+					Actor->SetActorTransform(ActorData.Transform);
+
+					FMemoryReader MemReader(ActorData.ByteData);
+
+					FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
+					//marks it as only looking for those saving props UPROPERTY(SaveGame)
+					Ar.ArIsSaveGame = true;
+					//converts binary array abck into actors SaveGame UPROPERTIES 
+					Actor->Serialize(Ar);
+
+					ISGameplayInterface::Execute_OnActorLoaded(Actor);
+
+					break;
+				}
+			}
+
+		}
+	}
+	else
+	{
+		CurrentSaveGame = Cast < USSaveGame>(UGameplayStatics::CreateSaveGameObject(USSaveGame::StaticClass()));
+
+		UE_LOG(LogTemp, Log, TEXT("Created new SaveGame data"));
+	}
+
+
+
+}

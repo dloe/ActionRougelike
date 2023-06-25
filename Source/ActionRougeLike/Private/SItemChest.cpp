@@ -31,6 +31,13 @@ void ASItemChest::Interact_Implementation(APawn* InstigatorPawn)
 	OnRep_LidOpened();
 }
 
+void ASItemChest::OnActorLoaded_Implementation()
+{
+	//set the object state (visual state)
+	OnRep_LidOpened();
+
+}
+
 // Called when the game starts or when spawned
 void ASItemChest::BeginPlay()
 {
@@ -46,7 +53,7 @@ void ASItemChest::Tick(float DeltaTime)
 }
 
 
-//multiplayer
+//multiplayer - aka UpdateLidState() - could rename tbh
 void ASItemChest::OnRep_LidOpened()
 {
 	float CurrPitch = bLidOpened ? TargetPitch : 0.0f;

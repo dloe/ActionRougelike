@@ -2,6 +2,7 @@
 
 
 #include "SPlayerState.h"
+#include <ActionRougeLike/Public/SSaveGame.h>
 
 ASPlayerState::ASPlayerState()
 {
@@ -45,4 +46,22 @@ int ASPlayerState::AddCredits(int32 delta)
 	//we might have a cap on how many you can get so for just return true by default
 	OnCreditsChanged.Broadcast(this, Credits, delta);
 	return Credits;
+}
+
+void ASPlayerState::LoadPlayerState_Implementation(USSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		SaveObject->Credits = Credits;
+	}
+
+}
+
+void ASPlayerState::SavePlayerState_Implementation(USSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		Credits = SaveObject->Credits;
+	}
+
 }
