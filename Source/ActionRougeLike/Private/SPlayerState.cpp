@@ -2,6 +2,7 @@
 
 
 #include "SPlayerState.h"
+#include "Net/UnrealNetwork.h"
 #include <ActionRougeLike/Public/SSaveGame.h>
 
 ASPlayerState::ASPlayerState()
@@ -64,4 +65,13 @@ void ASPlayerState::SavePlayerState_Implementation(USSaveGame* SaveObject)
 		Credits = SaveObject->Credits;
 	}
 
+}
+
+void ASPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASPlayerState, Credits);
+	//DOREPLIFETIME(USAttributeComponent, HealthMax);
+	//DOREPLIFETIME_CONDITION(USAttributeComponent, HealthMax, COND_InitialOnly);
 }

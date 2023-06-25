@@ -14,7 +14,7 @@ class ACTIONROUGELIKE_API ASPlayerState : public APlayerState
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Events")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Events")
 		int32 Credits;
 public:
 	ASPlayerState();
@@ -36,6 +36,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCreditsChanged OnCreditsChanged;
+
+	//UFUNCTION()
+	//void OnRep_OnCreditsChanged();
 
 	UFUNCTION(BlueprintNativeEvent)
 	void SavePlayerState(USSaveGame* SaveObject);
