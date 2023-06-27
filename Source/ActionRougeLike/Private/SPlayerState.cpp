@@ -8,7 +8,7 @@
 ASPlayerState::ASPlayerState()
 {
 	Credits = 0;
-
+	SetReplicates(true);
 }
 
 int ASPlayerState::GetCredits()
@@ -47,6 +47,13 @@ int ASPlayerState::AddCredits(int32 delta)
 	//we might have a cap on how many you can get so for just return true by default
 	OnCreditsChanged.Broadcast(this, Credits, delta);
 	return Credits;
+}
+
+//can use a param to get original val for easily finding delta
+void ASPlayerState::OnRep_Credits(int32 OldCredits)
+{
+	OnCreditsChanged.Broadcast(this, Credits, Credits - OldCredits);
+
 }
 
 void ASPlayerState::LoadPlayerState_Implementation(USSaveGame* SaveObject)

@@ -22,4 +22,10 @@ protected:
 
 	virtual void SetPawn(APawn* InPawn) override;
 
+	virtual void BeginPlayingState() override;
+
+	//this starts the stuff in playercontrollerbp we normally have in begin play
+	UFUNCTION(BlueprintImplementableEvent)
+	void BlueprintBeginPlayingState();
+
 };
