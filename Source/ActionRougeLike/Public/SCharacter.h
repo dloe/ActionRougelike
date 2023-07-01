@@ -48,6 +48,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	USActionComponent* ActionComp;
 
+	//TO DO
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Player")
 	ASPlayerState* PState;
 

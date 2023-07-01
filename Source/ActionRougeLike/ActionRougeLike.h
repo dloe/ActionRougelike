@@ -29,6 +29,8 @@ static void LogOnScreen(UObject* WorldContext, FString Msg, FColor Color = FColo
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, Duration, Color, NetPrefix + Msg);
+		//UE_LOG(LogTemp, Log, TEXT("%s %s"), *FString(NetPrefix), *FString(Msg));
+		
 	}
 
 }

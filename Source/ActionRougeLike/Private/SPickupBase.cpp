@@ -5,6 +5,8 @@
 #include "SAttributeComponent.h"
 #include "GameFramework/Actor.h"
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
+#include <ActionRougeLike/ActionRougeLike.h>
 #include "SGameplayInterface.h"
 
 
@@ -44,6 +46,7 @@ void ASPickupBase::Tick(float DeltaTime)
 //when player interacts with our health potion
 void ASPickupBase::Interact_Implementation(APawn* InstigatorPawn)
 {
+	//LogOnScreen(this, FString::Printf(TEXT("Interact")), FColor::Green);
 	//make sure our instiator
 	if (InstigatorPawn && InstigatorPawn != GetInstigator())
 	{
@@ -52,7 +55,7 @@ void ASPickupBase::Interact_Implementation(APawn* InstigatorPawn)
 		{
 			//base logic (could branch this off into a new function our children can override, then we dont have to do this few line setup
 			HideAndCooldownPowerup();
-
+			//Triggered = true;
 		}
 	}
 }
@@ -62,7 +65,7 @@ void ASPickupBase::OnTriggerTimer()
 	UE_LOG(LogTemp, Log, TEXT("No longer triggered..."));
 	//set bool and mesh
 	Triggered = false;
-	ShowPowerup(true);
+	//OnRep_Triggered();
 	//set mesh invisible and turn off interaction!
 	//BaseMesh->SetStaticMesh(NormalPotionMesh);
 	BaseMesh->SetVisibility(true, true);
@@ -73,21 +76,40 @@ void ASPickupBase::OnTriggerTimer()
 	GetWorldTimerManager().ClearTimer(TimerHandle);
 }
 
-void ASPickupBase::ShowPowerup(bool state)
+void ASPickupBase::ShowPowerup()
 {
+	//LogOnScreen(this, FString::Printf(TEXT("In show powerup: %d"), Triggered), FColor::Green);
 	//set mesh invisible and turn off interaction!
 	//BaseMesh->SetStaticMesh(NormalPotionMesh);
-	BaseMesh->SetVisibility(state, state);
+	BaseMesh->SetVisibility(!Triggered, true);
 
 	//turn on overlap events
-	SetActorEnableCollision(state);
+	SetActorEnableCollision(!Triggered);
 
 }
 
 void ASPickupBase::HideAndCooldownPowerup()
 {
 	Triggered = true;
-	ShowPowerup(false);
+	//ShowPowerup();
+	OnRep_Triggered();
 
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ASPickupBase::OnTriggerTimer, TriggerDelay);
+}
+
+
+void ASPickupBase::OnRep_Triggered()
+{
+	LogOnScreen(this, FString::Printf(TEXT("Got Coin...")), FColor::Green);
+	ShowPowerup();
+}
+
+void ASPickupBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	//gotta set the rules
+	DOREPLIFETIME(ASPickupBase, Triggered);
+
+
 }

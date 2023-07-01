@@ -30,8 +30,11 @@ protected:
 	UStaticMeshComponent* BaseMesh;
 
 	//if we are not done with cooldown yet
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing = OnRep_Triggered, BlueprintReadonly)
 	bool Triggered;
+
+	UFUNCTION()
+	void OnRep_Triggered();
 
 	//cooldown delay
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
@@ -49,7 +52,7 @@ public:
 
 	virtual void OnTriggerTimer();
 
-	virtual void ShowPowerup(bool state);
+	virtual void ShowPowerup();
 
 	void HideAndCooldownPowerup();
 };

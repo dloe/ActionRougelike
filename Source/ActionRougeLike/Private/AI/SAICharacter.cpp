@@ -13,6 +13,7 @@
 #include "SPlayerState.h"
 #include <ActionRougeLike/Public/SGameModeBase.h>
 #include <SActionComponent.h>
+#include <ActionRougeLike/ActionRougeLike.h>
 
 // Sets default values
 ASAICharacter::ASAICharacter()
@@ -52,17 +53,17 @@ void ASAICharacter::OnPawnSeen(APawn* Pawn)
         //add a draw debug string at the location of the actor so that we have something that shows where the player was spotted
         //DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted", nullptr, FColor::White, 4.0f, true);
 
-        EnemySpottedWidget = CreateWidget<USWorldUserWidget>(GetWorld(), EnemySpottedWidgetClass);
-        if (EnemySpottedWidget) {
-            EnemySpottedWidget->AttachedActor = this;
-            EnemySpottedWidget->AddToViewport(10);
-            DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted WIDGET", nullptr, FColor::White, 4.0f, true);
-            UE_LOG(LogTemp, Log, TEXT("PlayerSpotted WIDGET"));
-        }
-        else {
-            DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted NO WIDGET", nullptr, FColor::Red, 4.0f, true);
-            UE_LOG(LogTemp, Log, TEXT("PlayerSpotted NOOO WIDGET"));
-        }
+       // EnemySpottedWidget = CreateWidget<USWorldUserWidget>(GetWorld(), EnemySpottedWidgetClass);
+        //if (EnemySpottedWidget) {
+        //    EnemySpottedWidget->AttachedActor = this;
+        //    EnemySpottedWidget->AddToViewport(10);
+         //   DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted WIDGET", nullptr, FColor::White, 4.0f, true);
+         //   UE_LOG(LogTemp, Log, TEXT("PlayerSpotted WIDGET"));
+        //}
+        //else {
+        //    DrawDebugString(GetWorld(), GetActorLocation(), "PlayerSpotted NO WIDGET", nullptr, FColor::Red, 4.0f, true);
+         //   UE_LOG(LogTemp, Log, TEXT("PlayerSpotted NOOO WIDGET"));
+        //}
 
         MulticastPawnSeen();
     }
@@ -158,13 +159,14 @@ AActor* ASAICharacter::GetTargetActor() const
 
 void ASAICharacter::MulticastPawnSeen_Implementation()
 {
-    USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(), EnemySpottedWidgetClass);
-    if (NewWidget)
+    EnemySpottedWidget = CreateWidget<USWorldUserWidget>(GetWorld(), EnemySpottedWidgetClass);
+    if (EnemySpottedWidget)
     {
-        NewWidget->AttachedActor = this;
+        LogOnScreen(this, FString::Printf(TEXT("EnemySpotted Widget")), FColor::Blue);
+        EnemySpottedWidget->AttachedActor = this;
         // Index of 10 (or anything higher than default of 0) places this on top of any other widget.
         // May end up behind the minion health bar otherwise.
-        NewWidget->AddToViewport(10);
+        EnemySpottedWidget->AddToViewport(10);
     }
 }
 

@@ -6,6 +6,7 @@
 #include "SGameplayInterface.h"
 #include "VT/VirtualTextureBuildSettings.h"
 #include "SWorldUserWidget.h"
+#include <ActionRougeLike/ActionRougeLike.h>
 
 static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("su.InteractionDebugDraw"), false, TEXT("Enable Debug lines for Interact Command."), ECVF_Cheat);
 
@@ -160,7 +161,7 @@ void USInteractionActorComponent::ServerInteract_Implementation(AActor* InFocus)
 	APawn* MyPawn = Cast<APawn>(GetOwner());
 	//is ok if null ptr 
 
-
+	LogOnScreen(this, FString::Printf(TEXT("serv Interact")), FColor::Green);
 	ISGameplayInterface::Execute_Interact(InFocus, MyPawn);
 
 }

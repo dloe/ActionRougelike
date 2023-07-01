@@ -43,8 +43,6 @@ bool USAttributeComponent::ApplyHealthChange(AActor* Instigator, float Delta)
 	if (!GetOwner()->CanBeDamaged() && Delta < 0.0f)
 		return false;
 
-
-
 	//replication bug
 	//if (!GetOwner()->HasAuthority())
 	//{
@@ -108,7 +106,8 @@ void USAttributeComponent::ApplyRageChange(AActor* Instigator, float Delta)
 	Rage = FMath::Clamp(Rage + Delta, 0.0f, RageMax);
 	//UE_LOG(LogTemp, Log, TEXT("AFTER Range Delta: %d"), Rage);
 	//Update Rage UI 
-	OnRageChanged.Broadcast(this, Rage, Delta);
+	MulticastRageChanged(Instigator, Rage, Delta);
+	//OnRageChanged.Broadcast(this, Rage, Delta);
 
 }
 
@@ -164,12 +163,17 @@ void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 	DOREPLIFETIME(USAttributeComponent, Health);
 	DOREPLIFETIME(USAttributeComponent, HealthMax);
+	DOREPLIFETIME(USAttributeComponent, RageMax);
+	DOREPLIFETIME(USAttributeComponent, Rage);
 	//DOREPLIFETIME_CONDITION(USAttributeComponent, HealthMax, COND_InitialOnly);
 }
 
 void USAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
 {
 	OnHealthChanged.Broadcast(InstigatorActor, this, NewHealth, Delta);
+}
 
-	
+void USAttributeComponent::MulticastRageChanged_Implementation(AActor* InstigatorActor, float NewRage, float Delta)
+{
+	OnRageChanged.Broadcast(this, Rage, Delta);
 }
