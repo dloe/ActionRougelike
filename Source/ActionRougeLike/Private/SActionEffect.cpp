@@ -2,6 +2,7 @@
 
 
 #include "SActionEffect.h"
+#include "GameFramework/GameStateBase.h"
 #include "SActionComponent.h"
 
 
@@ -29,6 +30,18 @@ void USActionEffect::StartAction_Implementation(AActor* Instigator)
 
 		GetWorld()->GetTimerManager().SetTimer(PeriodHandle, Delegate, Period, true);
 	}
+}
+
+float USActionEffect::GetTimeRemaining()
+{
+	AGameStateBase* GS = GetWorld()->GetGameState<AGameStateBase>();
+	
+	if (GS) {
+		float EndTime = TimeStarted + Duration;
+		return EndTime - GS->GetServerWorldTimeSeconds();;
+	}
+
+	return Duration;
 }
 
 void USActionEffect::StopAction_Implementation(AActor* Instigator)

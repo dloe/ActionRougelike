@@ -36,6 +36,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Effect")
 	void ExecutePeriodicEffect(AActor* Instigator);
 
-	
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		float GetTimeRemaining();
 
 };
