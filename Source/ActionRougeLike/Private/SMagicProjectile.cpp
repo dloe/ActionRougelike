@@ -23,6 +23,8 @@ ASMagicProjectile::ASMagicProjectile()
 	myRadialForce->bImpulseVelChange = false;
 	myRadialForce->SetupAttachment(RootComponent);
 
+	InitialLifeSpan = 15.0f;
+
 	AudioCompFlight->Play(0.0f);
 	DamageAmount = 20.0f;
 	

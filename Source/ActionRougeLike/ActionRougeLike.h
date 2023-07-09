@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 
 
+DECLARE_STATS_GROUP(TEXT("STANFORD_Game"), STATGROUP_STANFORD, STATCAT_Advanced)
+
 //static function
 //for printing and diferentiating between client and server
 //
