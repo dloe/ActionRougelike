@@ -34,8 +34,9 @@ public:
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		//TSubclassOf<AActor> MonsterClass;
-		USMonsterData* MonsterData;
+	FPrimaryAssetId MonsterId; //USMonsterData* MonsterData;
+
+	//TSubclassOf<AActor> MonsterClass;
 
 	//change to pick this monster
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -117,6 +118,8 @@ protected:
 	void OnQueryPowerupSpawnCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 	UFUNCTION()
 	void OnQueryBotSpawnCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	void OnMonsterLoaded(FPrimaryAssetId LoadedId, FVector SpawnLocation);
 
 	UFUNCTION()
 	void RespawnPlayerElasped(AController* Controller);
