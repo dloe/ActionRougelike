@@ -60,6 +60,13 @@ void ASPickupBase::Interact_Implementation(APawn* InstigatorPawn)
 	}
 }
 
+FText ASPickupBase::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+
+
+	return FText::GetEmpty();
+}
+
 void ASPickupBase::OnTriggerTimer()
 {
 	UE_LOG(LogTemp, Log, TEXT("No longer triggered..."));
@@ -96,7 +103,6 @@ void ASPickupBase::HideAndCooldownPowerup()
 
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ASPickupBase::OnTriggerTimer, TriggerDelay);
 }
-
 
 void ASPickupBase::OnRep_Triggered()
 {

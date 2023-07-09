@@ -55,4 +55,6 @@ public:
 	virtual void ShowPowerup();
 
 	void HideAndCooldownPowerup();
+
+	FText GetInteractText_Implementation(APawn* InstigatorPawn);
 };
