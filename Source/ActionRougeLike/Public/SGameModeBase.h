@@ -7,12 +7,49 @@
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "GameFramework/PlayerState.h"
+#include "Engine/DataTable.h"
 #include "SGameModeBase.generated.h"
 
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
 class USSaveGame;
+class UDataTable;
+class USMonsterData;
+
+
+//datatable row for spawning monsters in gamemode
+USTRUCT(BlueprintType)
+struct FMonsterInfoRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+
+	FMonsterInfoRow()
+	{
+		Weight = 1.0f;
+		SpawnCost = 5.0f;
+		KillReward = 20.0f;
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		//TSubclassOf<AActor> MonsterClass;
+		USMonsterData* MonsterData;
+
+	//change to pick this monster
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Weight;
+
+	//points required by gamemode to spawn this unit
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnCost;
+
+	//amount of credits awarded to killer of this unit
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float KillReward;
+};
+
 
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnCreditChange, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewCredits, float, Delta);
 
@@ -28,9 +65,13 @@ protected:
 	UPROPERTY()
 	USSaveGame* CurrentSaveGame;
 
-	//ai
+	//all available monsters
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	TSubclassOf<AActor> MinionClass;
+	UDataTable* MonsterTable;
+
+	//ai
+	//UPROPERTY(EditDefaultsOnly, Category = "AI")
+	//TSubclassOf<AActor> MinionClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UEnvQuery* SpawnBotQuery;

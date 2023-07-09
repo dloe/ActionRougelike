@@ -15,6 +15,7 @@
 #include <ActionRougeLike/Public/SCharacter.h>
 #include <ActionRougeLike/Public/SGameplayInterface.h>
 #include <Serialization/ObjectAndNameAsStringProxyArchive.h>
+#include "SMonsterData.h"
 //dont think the eenvqueryrunmode enum is needed to include header
 
 //cvar
@@ -169,7 +170,7 @@ void ASGameModeBase::OnQueryPowerupSpawnCompleted(UEnvQueryInstanceBlueprintWrap
 		int32 RandomClassIndex = FMath::RandRange(0, PowerupClasses.Num() - 1);
 		TSubclassOf<AActor> RandomPowerupClass = PowerupClasses[RandomClassIndex];
 
-		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
+		//GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
 
 		//keep for distance checks
 		UsedLocations.Add(PickedLocation);
@@ -194,7 +195,21 @@ void ASGameModeBase::OnQueryBotSpawnCompleted(UEnvQueryInstanceBlueprintWrapper*
 	//check our locations
 	if (Locations.IsValidIndex(0))
 	{
-		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
+		if (MonsterTable)
+		{
+			TArray<FMonsterInfoRow*> Rows;
+			MonsterTable->GetAllRows("", Rows);
+
+			//get random enemy
+			int32 RandomIndex = FMath::RandRange(0, Rows.Num() - 1);
+			FMonsterInfoRow* SelectedRow = Rows[RandomIndex];
+
+			//SelectedRow->SpawnCost
+			
+			GetWorld()->SpawnActor<AActor>(SelectedRow->MonsterData->MonsterClass, Locations[0], FRotator::ZeroRotator);
+		}
+
+		//GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
 
 		//track all used spawn locations
 		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Blue, false, 60.0f);
