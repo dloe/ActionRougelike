@@ -25,7 +25,9 @@ ASAICharacter::ASAICharacter()
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
     //fix an issue with collision on our capsule collider
-    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+    //GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+    //added our own projectile channel
+
     GetMesh()->SetGenerateOverlapEvents(true);
 
     CreditsOnKill = 20;

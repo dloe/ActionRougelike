@@ -97,7 +97,7 @@ void USAction_ProjectileAttack::AttackDelay_Elasped(ACharacter* InstigatorCharac
 
 		//replaced GetControlRotation with our new target rotation
 		const FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
-		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+		AActor* T = GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 	}
 
 	StopAction(InstigatorCharacter);

@@ -30,14 +30,23 @@ ASGameModeBase::ASGameModeBase()
 	WorldSpawnSet = false;
 	//assign PlayerStateClass
 	PlayerStateClass = ASPlayerState::StaticClass();
+	SlotName = "SaveGame01";
 }
 
 void ASGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
+	FString SelectedSaveSlot = UGameplayStatics::ParseOption(Options, "SaveGame");
+
+	if (SelectedSaveSlot.Len() > 0)
+	{
+		SlotName = SelectedSaveSlot;
+
+	}
+
 	LoadSaveGame();
-	SlotName = "SaveGame01";
+	
 }
 
 void ASGameModeBase::StartPlay()
